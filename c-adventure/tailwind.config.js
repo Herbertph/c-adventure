@@ -13,6 +13,10 @@ module.exports = {
         textDark: '#E2E8F0',
         textLight: '#1E293B',
       },
+      boxShadow: {
+        'top-sm': '0 -4px 6px -4px rgba(0, 0, 0, 0.1)',
+        'top-md': '0 -6px 10px -4px rgba(0, 0, 0, 0.15)',
+      },
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
         display: ['Outfit', ...defaultTheme.fontFamily.sans],

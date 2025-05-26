@@ -23,11 +23,12 @@
   
         <!-- Ilustração da direita -->
         <div class="flex-1 flex justify-center">
+          <!--insert image that is hero.png in public folder  -->
           <img
-            src="https://cdn-icons-png.flaticon.com/512/1236/1236533.png"
-            alt="Coding Adventure Icon"
-            class="w-64 h-64 md:w-80 md:h-80 object-contain"
-          />
+  src="/Hero.png"
+  alt="Coding Adventure Icon"
+  class="w-80 h-80 md:w-[28rem] md:h-[28rem] object-contain"
+/>
         </div>
       </div>
     </section>
