@@ -4,6 +4,8 @@ import HeroSection from './components/HeroSection.vue'
 import HowItWorks from './components/HowItWorks.vue'
 import CourseContent from './components/CourseContent.vue'
 import PricingSection from './components/PricingSection.vue'
+import ContactForm from './components/ContactForm.vue'
+import Footer from './components/Footer.vue'
 </script>
 
 <template>
@@ -12,6 +14,8 @@ import PricingSection from './components/PricingSection.vue'
  <HowItWorks/>
  <CourseContent/>
  <PricingSection/>
+ <ContactForm/>
+ <Footer/>
 </template>
 
 <style scoped>

@@ -4,7 +4,7 @@
       
       <!-- Esquerda: Logo -->
       <div class="text-primary font-display text-xl font-bold">
-        C-Adventure
+        C# - Adventure
       </div>
 
       <!-- Centro: Home -->
