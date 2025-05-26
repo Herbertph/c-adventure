@@ -1,22 +1,25 @@
 <template>
-    <header class="bg-backgroundLight dark:bg-backgroundDark shadow-md sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        
-        <!-- Logo -->
-        <div class="text-primary font-display text-xl font-bold">
-          C-Adventure
-        </div>
-  
-        <!-- Navegação -->
-        <nav class="hidden md:flex items-center gap-6 text-textLight dark:text-textDark">
-          <a href="#" class="hover:text-primary transition">Home</a>
-          <a href="#" class="hover:text-primary transition">Sign In</a>
-          <a href="#" class="hover:text-primary transition">Login</a>
-        </nav>
-  
-        <!-- Toggle dark mode -->
+  <header class="bg-backgroundLight dark:bg-backgroundDark shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      
+      <!-- Esquerda: Logo -->
+      <div class="text-primary font-display text-xl font-bold">
+        C-Adventure
+      </div>
+
+      <!-- Centro: Home -->
+      <div class="flex-1 flex justify-center text-textLight dark:text-textDark gap-6">
+        <a href="#" class="hover:text-primary transition">Home</a>
+        <a href="#" class="hover:text-primary transition">Conteúdo</a>
+        <a href="#" class="hover:text-primary transition">Preços</a>
+      </div>
+
+      <!-- Direita: Sign In, Login, Toggle -->
+      <div class="flex items-center gap-2 text-textLight dark:text-textDark">
+        <a href="#" class="hover:text-primary transition">Sign In</a>/
+        <a href="#" class="hover:text-primary transition">Login</a>
         <button
-          class="ml-4 text-textLight dark:text-textDark p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          class="text-textLight dark:text-textDark p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition"
           @click="toggleDarkMode"
           :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'"
         >
@@ -24,8 +27,9 @@
           <span v-else>🌙</span>
         </button>
       </div>
-    </header>
-  </template>
+    </div>
+  </header>
+</template>
   
   <script setup>
   import { ref, onMounted } from 'vue'

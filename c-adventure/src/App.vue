@@ -3,6 +3,7 @@ import Header from './components/Header.vue'
 import HeroSection from './components/HeroSection.vue'
 import HowItWorks from './components/HowItWorks.vue'
 import CourseContent from './components/CourseContent.vue'
+import PricingSection from './components/PricingSection.vue'
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import CourseContent from './components/CourseContent.vue'
  <HeroSection/>
  <HowItWorks/>
  <CourseContent/>
+ <PricingSection/>
 </template>
 
 <style scoped>
