@@ -1,5 +1,6 @@
 package com.adventure.auth.service;
 
+import com.adventure.auth.dto.LoginRequest;
 import com.adventure.auth.dto.RegisterRequest;
 import com.adventure.auth.exception.EmailAlreadyExistsException;
 import com.adventure.auth.model.User;
@@ -27,5 +28,14 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
+    }
+
+    public void login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
     }
 }

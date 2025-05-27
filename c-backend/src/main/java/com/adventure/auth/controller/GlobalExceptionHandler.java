@@ -25,4 +25,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEmailExists(EmailAlreadyExistsException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntime(RuntimeException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

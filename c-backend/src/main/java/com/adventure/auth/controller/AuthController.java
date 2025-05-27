@@ -1,5 +1,6 @@
 package com.adventure.auth.controller;
 
+import com.adventure.auth.dto.LoginRequest;
 import com.adventure.auth.dto.RegisterRequest;
 import com.adventure.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -19,5 +20,12 @@ public class AuthController {
         authService.register(request);
         return ResponseEntity.ok("User registered successfully");
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequest request) {
+        authService.login(request);
+        return ResponseEntity.ok("Login successful");
+    }
+
 }
 
