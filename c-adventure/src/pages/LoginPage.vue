@@ -29,8 +29,10 @@
   import { ref } from 'vue'
   import axios from 'axios'
   import { useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/authStore'
   
   const router = useRouter()
+  const auth = useAuthStore()
   
   const form = ref({
     email: '',
@@ -45,6 +47,8 @@
     try {
       const response = await axios.post('http://localhost:8080/auth/login', form.value)
       localStorage.setItem('token', response.data)
+  
+      await auth.fetchUser() // Atualiza o estado global imediatamente
       router.push('/me')
     } catch (err) {
       error.value = err.response?.data || 'Invalid credentials.'
