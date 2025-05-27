@@ -13,10 +13,10 @@
   
           <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-6">
             <button class="bg-primary text-white px-6 py-3 rounded-lg shadow hover:opacity-90 transition font-semibold">
-              Get Started Now
+              Comece Agora
             </button>
             <button class="flex items-center gap-2 border border-primary text-primary px-6 py-3 rounded-lg hover:bg-primary/10 transition">
-              ▶ Watch Video
+              ▶ Assistir Vídeo
             </button>
           </div>
         </div>
