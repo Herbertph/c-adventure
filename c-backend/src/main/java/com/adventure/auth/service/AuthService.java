@@ -6,6 +6,7 @@ import com.adventure.auth.exception.EmailAlreadyExistsException;
 import com.adventure.auth.model.User;
 import com.adventure.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService; // ✅ Adicionado
 
     public void register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -30,12 +32,14 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public void login(LoginRequest request) {
+    public String login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new BadCredentialsException("Invalid credentials");
         }
+
+        return jwtService.generateToken(user.getEmail()); // usa corretamente
     }
 }
