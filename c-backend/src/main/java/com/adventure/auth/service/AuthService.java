@@ -52,6 +52,7 @@ public class AuthService {
     }
 
     public UserResponse getUserFromToken(String token) {
+        String cleanToken = token.replace("Bearer", "").trim();
         User user = getAuthenticatedUser(token);
         UserResponse response = new UserResponse();
         response.setFirstName(user.getFirstName());

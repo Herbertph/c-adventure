@@ -44,8 +44,7 @@
   
     try {
       const response = await axios.post('http://localhost:8080/auth/login', form.value)
-      localStorage.setItem('token', response.data.token)
-      router.push('/user')
+      localStorage.setItem('token', response.data)
       router.push('/me')
     } catch (err) {
       error.value = err.response?.data || 'Invalid credentials.'

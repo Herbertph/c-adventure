@@ -41,7 +41,7 @@
   try {
     const response = await axios.get('http://localhost:8080/auth/me', {
       headers: {
-        Authorization: `Bearer ${token}`, // 👈 Certifique-se do espaço depois de "Bearer"
+        Authorization: `Bearer ${token.trim()}`, // 👈 Certifique-se do espaço depois de "Bearer"
       },
     })
     user.value = response.data

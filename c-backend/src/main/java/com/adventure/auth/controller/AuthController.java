@@ -30,7 +30,8 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(authService.getUserFromToken(token));
+        String cleanedToken = token.replace("Bearer ", "").trim();
+        return ResponseEntity.ok(authService.getUserFromToken(cleanedToken));
     }
 }
 
