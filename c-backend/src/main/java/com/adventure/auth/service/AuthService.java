@@ -2,11 +2,13 @@ package com.adventure.auth.service;
 
 import com.adventure.auth.dto.LoginRequest;
 import com.adventure.auth.dto.RegisterRequest;
+import com.adventure.auth.dto.UserResponse;
 import com.adventure.auth.exception.EmailAlreadyExistsException;
 import com.adventure.auth.model.User;
 import com.adventure.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,5 +43,20 @@ public class AuthService {
         }
 
         return jwtService.generateToken(user.getEmail()); // usa corretamente
+    }
+
+    public User getAuthenticatedUser(String token) {
+        String email = jwtService.extractEmail(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public UserResponse getUserFromToken(String token) {
+        User user = getAuthenticatedUser(token.replace("Bearer ", ""));
+        UserResponse response = new UserResponse();
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        return response;
     }
 }
