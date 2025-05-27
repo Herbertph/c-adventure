@@ -3,23 +3,23 @@
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       
       <!-- Esquerda: Logo -->
-      <div class="text-primary font-display text-xl font-bold">
+      <router-link to="/" class="text-primary font-display text-xl font-bold">
         C# - Adventure
-      </div>
+      </router-link>
 
-      <!-- Centro: Home -->
+      <!-- Centro: Navegação -->
       <div class="flex-1 flex justify-center text-textLight dark:text-textDark gap-6">
-        <a href="#" class="hover:text-primary transition">Home</a>
-        <a href="#" class="hover:text-primary transition">Conteúdo</a>
-        <a href="#" class="hover:text-primary transition">Preços</a>
+        <router-link to="/" class="hover:text-primary transition">Home</router-link>
+        <router-link to="/content" class="hover:text-primary transition">Conteúdo</router-link>
+        <router-link to="/pricing" class="hover:text-primary transition">Preços</router-link>
       </div>
 
-      <!-- Direita: Sign In, Login, Toggle -->
+      <!-- Direita: Acesso -->
       <div class="flex items-center gap-2 text-textLight dark:text-textDark">
-        <a href="#" class="hover:text-primary transition">Sign In</a>/
-        <a href="#" class="hover:text-primary transition">Login</a>
+        <router-link to="/register" class="hover:text-primary transition">Sign In</router-link> /
+        <router-link to="/login" class="hover:text-primary transition">Login</router-link>
         <button
-          class="text-textLight dark:text-textDark p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          class="ml-2 text-textLight dark:text-textDark p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition"
           @click="toggleDarkMode"
           :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'"
         >
@@ -30,19 +30,18 @@
     </div>
   </header>
 </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  
-  const isDark = ref(false)
-  
-  onMounted(() => {
-    isDark.value = document.documentElement.classList.contains('dark')
-  })
-  
-  const toggleDarkMode = () => {
-    isDark.value = !isDark.value
-    document.documentElement.classList.toggle('dark', isDark.value)
-  }
-  </script>
-  
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const isDark = ref(false)
+
+onMounted(() => {
+  isDark.value = document.documentElement.classList.contains('dark')
+})
+
+const toggleDarkMode = () => {
+  isDark.value = !isDark.value
+  document.documentElement.classList.toggle('dark', isDark.value)
+}
+</script>

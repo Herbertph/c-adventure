@@ -52,11 +52,13 @@ public class AuthService {
     }
 
     public UserResponse getUserFromToken(String token) {
-        User user = getAuthenticatedUser(token.replace("Bearer ", ""));
+        User user = getAuthenticatedUser(token);
         UserResponse response = new UserResponse();
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
         return response;
     }
+
+
 }
