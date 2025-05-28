@@ -42,7 +42,7 @@ const logout = () => {
           <button @click="logout" class="hover:text-primary transition">Logout</button>
         </template>
         <template v-else>
-          <router-link to="/register" class="hover:text-primary transition">Sign In</router-link> /
+          <router-link to="/register" class="hover:text-primary transition">Cadastro</router-link> /
           <router-link to="/login" class="hover:text-primary transition">Login</router-link>
         </template>
 
