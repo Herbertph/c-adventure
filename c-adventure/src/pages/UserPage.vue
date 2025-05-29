@@ -9,12 +9,19 @@
           <p><strong>Email:</strong> {{ user.email }}</p>
         </div>
   
+        
         <div v-else-if="error" class="text-red-500 text-sm text-center">
           {{ error }}
         </div>
   
         <div v-else class="text-center">Loading...</div>
   
+        <button
+  @click="router.push('/lessons')"
+  class="mt-4 w-full bg-blue-600 text-white p-2 rounded hover:opacity-90 transition"
+>
+  Acessar lições
+</button>
         <button
           @click="logout"
           class="mt-6 w-full bg-red-600 text-white p-2 rounded hover:opacity-90 transition"
