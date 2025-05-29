@@ -41,7 +41,7 @@
   
   function goToLesson(lesson) {
     if (lesson.locked) return
-    router.push(`/lesson/${lesson.id}`)
+    router.push(`/lessons/${lesson.id}`)
   }
   </script>
   

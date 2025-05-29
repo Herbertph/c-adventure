@@ -9,13 +9,18 @@ const router = createRouter({
     { path: '/me', component: () => import('../pages/UserPage.vue') },
     { path: '/lessons', component: () => import('../pages/LessonCardsPage.vue') },
     { path: '/lessons/:id', component: () => import('../pages/LessonView.vue') },
+    { path: '/:pathMatch(.*)*', redirect: '/' } // fallback para rotas inválidas
   ]
 })
 
 // Protege rotas privadas
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  if (['/me', '/lessons', '/lessons/:id'].includes(to.path) && !token) {
+
+  const protectedPaths = ['/me', '/lessons']
+  const isProtected = protectedPaths.some(p => to.path.startsWith(p))
+
+  if (isProtected && !token) {
     next('/login')
   } else {
     next()
