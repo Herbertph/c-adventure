@@ -33,12 +33,18 @@ const logout = () => {
       <div class="flex-1 flex justify-center text-textLight dark:text-textDark gap-6">
         <router-link to="/" class="hover:text-primary transition">Home</router-link>
         <router-link to="/content" class="hover:text-primary transition">Conteúdo</router-link>
-        <router-link to="/pricing" class="hover:text-primary transition">Preços</router-link>
+        <router-link to="/lessons" class="hover:text-primary transition">Lições</router-link>
       </div>
 
       <div class="flex items-center gap-2 text-textLight dark:text-textDark">
         <template v-if="auth.user">
-          <span class="font-semibold text-primary">{{ auth.user.firstName }}</span> /
+          <router-link
+            to="/me"
+            class="font-semibold text-primary hover:underline transition"
+          >
+            {{ auth.user.firstName }}
+          </router-link>
+          /
           <button @click="logout" class="hover:text-primary transition">Logout</button>
         </template>
         <template v-else>
