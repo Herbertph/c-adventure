@@ -1,11 +1,11 @@
 <template>
     <section class="min-h-screen bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12">
       <div class="max-w-md mx-auto bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg">
-        <h1 class="text-2xl font-bold mb-6 text-center text-primary">Your Profile</h1>
+        <h1 class="text-2xl font-bold mb-6 text-center text-primary">Seus dados</h1>
   
         <div v-if="user" class="space-y-4">
-          <p><strong>First Name:</strong> {{ user.firstName }}</p>
-          <p><strong>Last Name:</strong> {{ user.lastName }}</p>
+          <p><strong>Nome:</strong> {{ user.firstName }}</p>
+          <p><strong>Sobrenome:</strong> {{ user.lastName }}</p>
           <p><strong>Email:</strong> {{ user.email }}</p>
         </div>
   
@@ -14,7 +14,7 @@
           {{ error }}
         </div>
   
-        <div v-else class="text-center">Loading...</div>
+        <div v-else class="text-center">Carregando...</div>
   
         <button
   @click="router.push('/lessons')"
@@ -24,7 +24,7 @@
 </button>
         <button
           @click="logout"
-          class="mt-6 w-full bg-red-600 text-white p-2 rounded hover:opacity-90 transition"
+          class="mt-6 w-full bg-gray-600 text-white p-2 rounded hover:opacity-90 transition"
         >
           Logout
         </button>
