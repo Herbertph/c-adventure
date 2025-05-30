@@ -43,18 +43,17 @@
   
   onMounted(async () => {
   const token = localStorage.getItem('token')
-  console.log('Token carregado:', token) // 👈 Adicione isto
 
   try {
     const response = await axios.get('http://localhost:8080/auth/me', {
       headers: {
-        Authorization: `Bearer ${token.trim()}`, // 👈 Certifique-se do espaço depois de "Bearer"
+        Authorization: `Bearer ${token.trim()}`, 
       },
     })
     user.value = response.data
   } catch (err) {
     error.value = 'Failed to load user data.'
-    console.error('Erro ao carregar usuário:', err) // 👈 log completo
+    console.error('Erro ao carregar usuário:', err) 
   }
 })
   

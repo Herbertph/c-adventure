@@ -54,12 +54,16 @@ public class AuthService {
     public UserResponse getUserFromToken(String token) {
         String cleanToken = token.replace("Bearer", "").trim();
         User user = getAuthenticatedUser(token);
+
         UserResponse response = new UserResponse();
+        response.setId(user.getId());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
+
         return response;
     }
+
 
 
 }
