@@ -1,14 +1,14 @@
 <template>
     <section class="min-h-screen bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12">
       <div class="max-w-md mx-auto bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg">
-        <h1 class="text-2xl font-bold mb-6 text-center text-primary">Welcome back!</h1>
+        <h1 class="text-2xl font-bold mb-6 text-center text-primary">Bem-vindo de volta!</h1>
         <form @submit.prevent="submitLogin" class="space-y-4">
           <div>
             <label class="block mb-1 font-semibold">Email</label>
             <input v-model="form.email" type="email" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
           <div>
-            <label class="block mb-1 font-semibold">Password</label>
+            <label class="block mb-1 font-semibold">Senha</label>
             <input v-model="form.password" type="password" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
   
@@ -18,8 +18,8 @@
         </form>
   
         <p class="mt-4 text-sm text-center">
-          Don't have an account?
-          <router-link to="/register" class="text-primary hover:underline">Register here</router-link>
+          Não tem uma conta?
+          <router-link to="/register" class="text-primary hover:underline">Crie uma conta aqui</router-link>
         </p>
       </div>
     </section>

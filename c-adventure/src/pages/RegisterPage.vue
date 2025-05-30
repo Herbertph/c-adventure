@@ -1,14 +1,14 @@
 <template>
     <section class="min-h-screen bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12">
       <div class="max-w-md mx-auto bg-white dark:bg-zinc-900 p-8 rounded-xl shadow-lg">
-        <h1 class="text-2xl font-bold mb-6 text-center text-primary">Create your account</h1>
+        <h1 class="text-2xl font-bold mb-6 text-center text-primary">Crie sua conta</h1>
         <form @submit.prevent="submitForm" class="space-y-4">
           <div>
-            <label class="block mb-1 font-semibold">First Name</label>
+            <label class="block mb-1 font-semibold">Nome</label>
             <input v-model="form.firstName" type="text" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
           <div>
-            <label class="block mb-1 font-semibold">Last Name</label>
+            <label class="block mb-1 font-semibold">Sobrenome</label>
             <input v-model="form.lastName" type="text" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
           <div>
@@ -16,11 +16,11 @@
             <input v-model="form.email" type="email" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
           <div>
-            <label class="block mb-1 font-semibold">Password</label>
+            <label class="block mb-1 font-semibold">Senha</label>
             <input v-model="form.password" type="password" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
           <div>
-            <label class="block mb-1 font-semibold">Confirm Password</label>
+            <label class="block mb-1 font-semibold">Confirmar Senha</label>
             <input v-model="form.confirmPassword" type="password" required class="w-full p-2 rounded border dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" />
           </div>
   
@@ -31,8 +31,8 @@
         </form>
   
         <p class="mt-4 text-sm text-center">
-          Already have an account?
-          <router-link to="/login" class="text-primary hover:underline">Login here</router-link>
+          Já tem uma conta?
+          <router-link to="/login" class="text-primary hover:underline">Faça login aqui</router-link>
         </p>
       </div>
     </section>
