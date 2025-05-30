@@ -57,7 +57,7 @@ Actual: {{ result.actual }}
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import authAxios from '@/axios'
 import lessonApi from '@/axiosLesson'
@@ -71,18 +71,21 @@ const result = ref(null)
 const userId = ref(null)
 
 const lessonId = computed(() => Number(route.params.id))
-const hasNextLesson = computed(() => lessonId.value < 3) // ← ajuste conforme total de lições
+const hasNextLesson = computed(() => lessonId.value < 3) // ajuste conforme o total real de lições
 
-onMounted(async () => {
+const fetchLesson = async () => {
   try {
     const res = await lessonApi.get(`/lessons/${lessonId.value}`)
     lesson.value = res.data
     code.value = res.data.initialCode
+    result.value = null
     console.log('Lição carregada:', lesson.value)
   } catch (err) {
     console.error('Erro ao carregar lição:', err)
   }
+}
 
+const fetchUser = async () => {
   try {
     const token = localStorage.getItem('token')
     console.log('Token carregado:', token)
@@ -91,12 +94,22 @@ onMounted(async () => {
       headers: { Authorization: `Bearer ${token}` },
     })
 
-    console.log('Resposta completa de /auth/me:', resUser.data)
     userId.value = resUser.data.id
     console.log('Usuário carregado:', userId.value)
   } catch (err) {
     console.error('Erro ao carregar usuário:', err)
   }
+}
+
+// Carrega ao montar
+onMounted(async () => {
+  await fetchLesson()
+  await fetchUser()
+})
+
+// Recarrega ao mudar o ID da lição
+watch(() => route.params.id, async () => {
+  await fetchLesson()
 })
 
 const runCode = async () => {
