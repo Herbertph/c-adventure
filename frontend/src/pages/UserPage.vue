@@ -32,34 +32,32 @@
     </section>
   </template>
   
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  import { useRouter } from 'vue-router'
-  
-  const user = ref(null)
-  const error = ref('')
-  const router = useRouter()
-  
-  onMounted(async () => {
-  const token = localStorage.getItem('token')
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/services/api'
 
+const user = ref(null)
+const error = ref('')
+const router = useRouter()
+
+onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8080/auth/me', {
-      headers: {
-        Authorization: `Bearer ${token.trim()}`, 
-      },
-    })
+    const response = await api.get('/auth/me')
     user.value = response.data
   } catch (err) {
     error.value = 'Failed to load user data.'
-    console.error('Erro ao carregar usuário:', err) 
-  }
-})
-  
-  const logout = () => {
+    console.error('Erro ao carregar usuário:', err)
+
     localStorage.removeItem('token')
     router.push('/login')
   }
-  </script>
+})
+
+const logout = () => {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
+</script>
+
   

@@ -38,42 +38,45 @@
     </section>
   </template>
   
-  <script setup>
-  import { ref } from 'vue'
-  import axios from 'axios'
-  import { useRouter } from 'vue-router'
-  
-  const router = useRouter()
-  
-  const form = ref({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
-  
-  const error = ref('')
-  const success = ref('')
-  
-  const submitForm = async () => {
-    error.value = ''
-    success.value = ''
-  
-    if (form.value.password !== form.value.confirmPassword) {
-      error.value = "Passwords do not match."
-      return
-    }
-  
-    try {
-      await axios.post('http://localhost:8080/auth/register', form.value)
-      success.value = "Registration successful! Redirecting..."
-      setTimeout(() => {
-        router.push('/login')
-      }, 1500)
-    } catch (err) {
-      error.value = err.response?.data || 'An error occurred.'
-    }
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/services/api'
+
+
+const router = useRouter()
+
+const form = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+})
+
+const error = ref('')
+const success = ref('')
+
+const submitForm = async () => {
+  error.value = ''
+  success.value = ''
+
+  if (form.value.password !== form.value.confirmPassword) {
+    error.value = 'Passwords do not match.'
+    return
   }
-  </script>
+
+  try {
+    await api.post('/auth/register', form.value)
+
+    success.value = 'Registration successful! Redirecting...'
+
+    setTimeout(() => {
+      router.push('/login')
+    }, 1500)
+  } catch (err) {
+    error.value = err.response?.data || 'An error occurred.'
+  }
+}
+</script>
   

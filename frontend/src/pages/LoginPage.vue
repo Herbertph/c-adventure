@@ -25,34 +25,38 @@
     </section>
   </template>
   
-  <script setup>
-  import { ref } from 'vue'
-  import axios from 'axios'
-  import { useRouter } from 'vue-router'
-  import { useAuthStore } from '@/stores/authStore'
-  
-  const router = useRouter()
-  const auth = useAuthStore()
-  
-  const form = ref({
-    email: '',
-    password: '',
-  })
-  
-  const error = ref('')
-  
-  const submitLogin = async () => {
-    error.value = ''
-  
-    try {
-      const response = await axios.post('http://localhost:8080/auth/login', form.value)
-      localStorage.setItem('token', response.data)
-  
-      await auth.fetchUser() // Atualiza o estado global imediatamente
-      router.push('/me')
-    } catch (err) {
-      error.value = err.response?.data || 'Invalid credentials.'
-    }
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+import api from '@/services/api'
+
+
+const router = useRouter()
+const auth = useAuthStore()
+
+const form = ref({
+  email: '',
+  password: '',
+})
+
+const error = ref('')
+
+const submitLogin = async () => {
+  error.value = ''
+
+  try {
+    const response = await api.post('/auth/login', form.value)
+
+    localStorage.setItem('token', response.data)
+
+    await auth.fetchUser()
+    router.push('/me')
+  } catch (err) {
+    error.value = err.response?.data || 'Invalid credentials.'
   }
-  </script>
+}
+</script>
+
+
   

@@ -64,71 +64,55 @@ Actual: {{ result.actual }}
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import authAxios from '@/axios'
-import lessonApi from '@/axiosLesson'
+import { useAuthStore } from '@/stores/authStore'
+import api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const lesson = ref(null)
 const code = ref('')
 const result = ref(null)
-const userId = ref(null)
 
 const lessonId = computed(() => Number(route.params.id))
-const hasNextLesson = computed(() => lessonId.value < 3) // ajuste conforme o total real de lições
+const hasNextLesson = computed(() => lessonId.value < 3)
 
+// 🔹 BUSCA DA LIÇÃO (ROTA CORRETA)
 const fetchLesson = async () => {
   try {
-    const res = await lessonApi.get(`/lessons/${lessonId.value}`)
+    const res = await api.get(`/lessons/${lessonId.value}`)
     lesson.value = res.data
     code.value = res.data.initialCode
     result.value = null
-    console.log('Lição carregada:', lesson.value)
   } catch (err) {
     console.error('Erro ao carregar lição:', err)
   }
 }
 
-const fetchUser = async () => {
-  try {
-    const token = localStorage.getItem('token')
-    console.log('Token carregado:', token)
-
-    const resUser = await authAxios.get('/auth/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-
-    userId.value = resUser.data.id
-    console.log('Usuário carregado:', userId.value)
-  } catch (err) {
-    console.error('Erro ao carregar usuário:', err)
-  }
-}
-
-// Carrega ao montar
 onMounted(async () => {
-  await fetchLesson()
-  await fetchUser()
-})
-
-// Recarrega ao mudar o ID da lição
-watch(() => route.params.id, async () => {
+  if (!authStore.user) {
+    await authStore.fetchUser()
+  }
   await fetchLesson()
 })
 
+watch(() => route.params.id, fetchLesson)
+
+// 🔹 EXECUÇÃO DO CÓDIGO (ROTA CORRETA)
 const runCode = async () => {
   try {
-    const res = await lessonApi.post('/execute', {
+    const res = await api.post('/lessons/submit', {
       lessonId: lesson.value.id,
       language: 'csharp',
       code: code.value,
       input: '',
     })
 
-    if (res.data.success && userId.value) {
-      await lessonApi.post('/progress', {
-        userId: userId.value,
+    // 🔹 SALVAR PROGRESSO (ROTA CORRETA)
+    if (res.data.success && authStore.user?.id) {
+      await api.post('/progress', {
+        userId: authStore.user.id,
         lessonId: lesson.value.id,
       })
     }
@@ -148,6 +132,7 @@ const goToNextLesson = () => {
   router.push(`/lessons/${lessonId.value + 1}`)
 }
 </script>
+
 
 <style scoped>
 .fade-slide-enter-active,

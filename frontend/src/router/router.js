@@ -14,7 +14,6 @@ const router = createRouter({
   ]
 })
 
-// Protege rotas privadas usando meta + Pinia (caso queira usar o authStore depois)
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
 

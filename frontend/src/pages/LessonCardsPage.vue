@@ -30,11 +30,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import authAxios from '@/axios'
-import lessonApi from '@/axiosLesson'
+import { useAuthStore } from '@/stores/authStore'
+import api from '@/services/api'
 
 const router = useRouter()
-const userId = ref(null)
+const authStore = useAuthStore()
 
 const lessons = ref([
   { id: 1, title: 'Lesson 1: Hello World', locked: false, completed: false },
@@ -44,28 +44,29 @@ const lessons = ref([
 
 onMounted(async () => {
   try {
-    const resUser = await authAxios.get('http://localhost:8080/auth/me')
-    userId.value = resUser.data.id
-    console.log('Usuário carregado:', userId.value)
-
-    // 🔒 Só depois de obter o userId, buscamos o progresso
-    if (userId.value) {
-      const resProgress = await lessonApi.get(`/progress/${userId.value}`)
-      const completedIds = resProgress.data
-
-      // Atualizamos visualmente as lições
-      lessons.value = lessons.value.map((lesson, index) => {
-        const completed = completedIds.includes(lesson.id)
-        const previousCompleted = index === 0 || completedIds.includes(lessons.value[index - 1].id)
-        return {
-          ...lesson,
-          completed,
-          locked: !completed && !previousCompleted
-        }
-      })
+    if (!authStore.user) {
+      await authStore.fetchUser()
     }
+
+    const userId = authStore.user?.id
+    if (!userId) return
+
+    const resProgress = await api.get(`/progress/${userId}`)
+    const completedIds = resProgress.data
+
+    lessons.value = lessons.value.map((lesson, index) => {
+      const completed = completedIds.includes(lesson.id)
+      const previousCompleted =
+        index === 0 || completedIds.includes(lessons.value[index - 1].id)
+
+      return {
+        ...lesson,
+        completed,
+        locked: !completed && !previousCompleted,
+      }
+    })
   } catch (err) {
-    console.error('Erro ao carregar usuário ou progresso:', err)
+    console.error('Erro ao carregar progresso:', err)
   }
 })
 
