@@ -41,11 +41,13 @@ public class LessonController {
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId
     ) {
+        System.out.println("Acessando lição " + id + " para userId: " + userId);
         if (id > 1) {
             boolean hasPrevious =
                     progressService.hasCompleted(userId, id - 1);
-
+        System.out.println("Liçao anterior ( " + (id - 1) + ") concluída? " + hasPrevious);
             if (!hasPrevious) {
+                System.out.println("Bloqueando acesso à lição " + id);
                 return ResponseEntity.status(403).build();
             }
         }
