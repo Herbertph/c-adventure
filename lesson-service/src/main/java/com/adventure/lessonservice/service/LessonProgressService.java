@@ -1,6 +1,6 @@
 package com.adventure.lessonservice.service;
 
-import com.adventure.lessonservice.dto.ProgressRequest;
+
 import com.adventure.lessonservice.model.LessonProgress;
 import com.adventure.lessonservice.repository.LessonProgressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,13 @@ public class LessonProgressService {
         progress.setCompleted(true);
         progressRepository.save(progress);
     }
+
+     public boolean hasCompleted(Long userId, Long lessonId) {
+        return progressRepository
+                .existsByUserIdAndLessonIdAndCompletedTrue(userId, lessonId);
+    }
+
+    
 
     public List<Long> getCompletedLessonIds(Long userId) {
         return progressRepository.findByUserId(userId).stream()

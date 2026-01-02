@@ -29,9 +29,17 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(@RequestHeader("Authorization") String token) {
-        String cleanedToken = token.replace("Bearer ", "").trim();
-        return ResponseEntity.ok(authService.getUserFromToken(cleanedToken));
+public ResponseEntity<UserResponse> me(
+    @RequestHeader(value = "Authorization", required = false) String token
+) {
+    if (token == null || !token.startsWith("Bearer ")) {
+        return ResponseEntity.status(401).build();
     }
+
+    String cleanedToken = token.replace("Bearer ", "").trim();
+    return ResponseEntity.ok(authService.getUserFromToken(cleanedToken));
+}
+
+
 }
 

@@ -4,8 +4,7 @@ import com.adventure.lessonservice.dto.SubmissionRequest;
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
 import com.adventure.lessonservice.service.CodeExecutionService;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +15,19 @@ import java.util.Map;
 @RequestMapping("/lessons")
 public class LessonController {
 
-    @Autowired
-    private LessonRepository lessonRepository;
+    private final LessonRepository lessonRepository;
+    private final CodeExecutionService codeExecutionService;
+    private final LessonProgressService progressService;
 
-    @Autowired
-    private CodeExecutionService codeExecutionService;
+    public LessonController(
+            LessonRepository lessonRepository,
+            CodeExecutionService codeExecutionService,
+            LessonProgressService progressService
+    ) {
+        this.lessonRepository = lessonRepository;
+        this.codeExecutionService = codeExecutionService;
+        this.progressService = progressService;
+    }
 
     // GET /lessons → Lista todas as lições
     @GetMapping
@@ -28,15 +35,27 @@ public class LessonController {
         return lessonRepository.findAll();
     }
 
-    // GET /lessons/{id} → Busca uma lição específica
+    // 🔒 GET /lessons/{id} → Busca lição com bloqueio por progresso
     @GetMapping("/{id}")
-    public ResponseEntity<Lesson> getById(@PathVariable Long id) {
+    public ResponseEntity<Lesson> getById(
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        if (id > 1) {
+            boolean hasPrevious =
+                    progressService.hasCompleted(userId, id - 1);
+
+            if (!hasPrevious) {
+                return ResponseEntity.status(403).build();
+            }
+        }
+
         return lessonRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /lessons/submit → Submete um código para validação
+    // POST /lessons/submit → Submete código
     @PostMapping("/submit")
     public ResponseEntity<?> submitCode(@RequestBody SubmissionRequest request) {
         Lesson lesson = lessonRepository.findById(request.lessonId).orElse(null);
@@ -45,9 +64,14 @@ public class LessonController {
             return ResponseEntity.badRequest().body("Lição não encontrada.");
         }
 
-        String output = codeExecutionService.executeCode(request.language, request.code, request.input);
+        String output = codeExecutionService.executeCode(
+                request.language,
+                request.code,
+                request.input
+        );
 
-        boolean passed = output.trim().equalsIgnoreCase(lesson.getExpectedOutput().trim());
+        boolean passed = output.trim()
+                .equalsIgnoreCase(lesson.getExpectedOutput().trim());
 
         return ResponseEntity.ok(
                 Map.of(
@@ -58,15 +82,18 @@ public class LessonController {
         );
     }
 
-    // POST /lessons → Cria uma nova lição
+    // POST /lessons → Criar lição
     @PostMapping
     public Lesson createLesson(@RequestBody Lesson lesson) {
         return lessonRepository.save(lesson);
     }
 
-    // PUT /lessons/{id} → Atualiza uma lição existente
+    // PUT /lessons/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Lesson> updateLesson(@PathVariable Long id, @RequestBody Lesson lesson) {
+    public ResponseEntity<Lesson> updateLesson(
+            @PathVariable Long id,
+            @RequestBody Lesson lesson
+    ) {
         if (!lessonRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -74,7 +101,7 @@ public class LessonController {
         return ResponseEntity.ok(lessonRepository.save(lesson));
     }
 
-    // DELETE /lessons/{id} → Deleta uma lição
+    // DELETE /lessons/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
         if (!lessonRepository.existsById(id)) {
@@ -84,9 +111,3 @@ public class LessonController {
         return ResponseEntity.noContent().build();
     }
 }
-
-
-
-
-
-

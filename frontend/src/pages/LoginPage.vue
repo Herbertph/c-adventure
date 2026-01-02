@@ -51,11 +51,14 @@ const submitLogin = async () => {
     localStorage.setItem('token', response.data)
 
     await auth.fetchUser()
+    localStorage.setItem('userId', auth.user.id)
+
     router.push('/me')
   } catch (err) {
     error.value = err.response?.data || 'Invalid credentials.'
   }
 }
+
 </script>
 
 

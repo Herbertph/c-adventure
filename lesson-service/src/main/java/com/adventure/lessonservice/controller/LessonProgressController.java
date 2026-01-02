@@ -1,6 +1,7 @@
 package com.adventure.lessonservice.controller;
 
 import com.adventure.lessonservice.dto.ProgressRequest;
+import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,4 +26,6 @@ public class LessonProgressController {
     public List<Long> getCompletedLessons(@PathVariable Long userId) {
         return progressService.getCompletedLessonIds(userId);
     }
+
+   
 }

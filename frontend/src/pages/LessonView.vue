@@ -64,12 +64,10 @@ Actual: {{ result.actual }}
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
 import api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
 
 const lesson = ref(null)
 const code = ref('')
@@ -78,7 +76,7 @@ const result = ref(null)
 const lessonId = computed(() => Number(route.params.id))
 const hasNextLesson = computed(() => lessonId.value < 3)
 
-// 🔹 BUSCA DA LIÇÃO (ROTA CORRETA)
+// 🔹 BUSCA DA LIÇÃO (BACKEND DECIDE SE PODE)
 const fetchLesson = async () => {
   try {
     const res = await api.get(`/lessons/${lessonId.value}`)
@@ -86,20 +84,18 @@ const fetchLesson = async () => {
     code.value = res.data.initialCode
     result.value = null
   } catch (err) {
-    console.error('Erro ao carregar lição:', err)
+    if (err.response?.status === 403) {
+      router.push('/lessons') // 👈 volta para os cards
+    } else {
+      console.error('Erro ao carregar lição:', err)
+    }
   }
 }
 
-onMounted(async () => {
-  if (!authStore.user) {
-    await authStore.fetchUser()
-  }
-  await fetchLesson()
-})
-
+onMounted(fetchLesson)
 watch(() => route.params.id, fetchLesson)
 
-// 🔹 EXECUÇÃO DO CÓDIGO (ROTA CORRETA)
+// 🔹 EXECUÇÃO
 const runCode = async () => {
   try {
     const res = await api.post('/lessons/submit', {
@@ -109,10 +105,10 @@ const runCode = async () => {
       input: '',
     })
 
-    // 🔹 SALVAR PROGRESSO (ROTA CORRETA)
-    if (res.data.success && authStore.user?.id) {
+    // 🔹 SALVAR PROGRESSO (userId vem do interceptor)
+    if (res.data.success) {
       await api.post('/progress', {
-        userId: authStore.user.id,
+        userId: Number(localStorage.getItem('userId')),
         lessonId: lesson.value.id,
       })
     }
@@ -132,6 +128,7 @@ const goToNextLesson = () => {
   router.push(`/lessons/${lessonId.value + 1}`)
 }
 </script>
+
 
 
 <style scoped>

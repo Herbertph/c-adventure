@@ -30,11 +30,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
 import api from '@/services/api'
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 const lessons = ref([
   { id: 1, title: 'Lesson 1: Hello World', locked: false, completed: false },
@@ -44,11 +42,7 @@ const lessons = ref([
 
 onMounted(async () => {
   try {
-    if (!authStore.user) {
-      await authStore.fetchUser()
-    }
-
-    const userId = authStore.user?.id
+    const userId = localStorage.getItem('userId')
     if (!userId) return
 
     const resProgress = await api.get(`/progress/${userId}`)
@@ -75,3 +69,4 @@ function goToLesson(lesson) {
   router.push(`/lessons/${lesson.id}`)
 }
 </script>
+
