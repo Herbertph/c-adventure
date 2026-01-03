@@ -16,39 +16,58 @@ public class AuthController {
 
     private final AuthService authService;
 
+    // ---------- REGISTER ----------
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.ok("User registered successfully");
     }
 
+    @RequestMapping(value = "/register", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> registerOptions() {
+        return ResponseEntity.ok()
+                .header("Access-Control-Allow-Origin", "https://c-adventure.vercel.app")
+                .header("Access-Control-Allow-Methods", "POST,OPTIONS")
+                .header("Access-Control-Allow-Headers", "Content-Type")
+                .build();
+    }
+
+    // ---------- LOGIN ----------
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid LoginRequest request) {
         String token = authService.login(request);
         return ResponseEntity.ok(token);
     }
 
+    @RequestMapping(value = "/login", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> loginOptions() {
+        return ResponseEntity.ok()
+                .header("Access-Control-Allow-Origin", "https://c-adventure.vercel.app")
+                .header("Access-Control-Allow-Methods", "POST,OPTIONS")
+                .header("Access-Control-Allow-Headers", "Content-Type")
+                .build();
+    }
+
+    // ---------- ME ----------
     @GetMapping("/me")
-public ResponseEntity<UserResponse> me(
-        @RequestHeader(value = "Authorization", required = false) String token
-) {
-    if (token == null || !token.startsWith("Bearer ")) {
-        return ResponseEntity.status(401).build();
+    public ResponseEntity<UserResponse> me(
+            @RequestHeader(value = "Authorization", required = false) String token
+    ) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).build();
+        }
+
+        try {
+            String cleanedToken = token.replace("Bearer ", "").trim();
+            return ResponseEntity.ok(authService.getUserFromToken(cleanedToken));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build();
+        }
     }
 
-    try {
-        String cleanedToken = token.replace("Bearer ", "").trim();
-        return ResponseEntity.ok(authService.getUserFromToken(cleanedToken));
-    } catch (Exception e) {
-        return ResponseEntity.status(401).build();
+    // ---------- HEALTH ----------
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
     }
 }
-
-@GetMapping("/health")
-public String health() {
-    return "OK";
-}
-
-
-}
-
