@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "railway-deploy": "npm run build"
+    "preview": "vite preview --host",
+    "start": "vite preview --host"
   },
   "dependencies": {
     "@vueuse/motion": "^3.0.3",
