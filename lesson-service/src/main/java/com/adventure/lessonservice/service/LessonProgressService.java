@@ -1,9 +1,7 @@
 package com.adventure.lessonservice.service;
 
-
 import com.adventure.lessonservice.model.LessonProgress;
 import com.adventure.lessonservice.repository.LessonProgressRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,29 +9,40 @@ import java.util.List;
 @Service
 public class LessonProgressService {
 
-    @Autowired
-    private LessonProgressRepository progressRepository;
+    private final LessonProgressRepository repository;
 
+    public LessonProgressService(LessonProgressRepository repository) {
+        this.repository = repository;
+    }
+
+    // Marca lição como concluída
     public void markAsCompleted(Long userId, Long lessonId) {
-        LessonProgress progress = progressRepository
+        LessonProgress progress = repository
                 .findByUserIdAndLessonId(userId, lessonId)
-                .orElse(new LessonProgress(null, userId, lessonId, false));
+                .orElseGet(() -> LessonProgress.builder()
+                        .userId(userId)
+                        .lessonId(lessonId)
+                        .completed(false)
+                        .build()
+                );
 
         progress.setCompleted(true);
-        progressRepository.save(progress);
+        repository.save(progress);
     }
 
-     public boolean hasCompleted(Long userId, Long lessonId) {
-        return progressRepository
-                .existsByUserIdAndLessonIdAndCompletedTrue(userId, lessonId);
-    }
-
-    
-
+    // Retorna IDs das lições concluídas
     public List<Long> getCompletedLessonIds(Long userId) {
-        return progressRepository.findByUserId(userId).stream()
-                .filter(LessonProgress::isCompleted)
+        return repository.findByUserIdAndCompletedTrue(userId)
+                .stream()
                 .map(LessonProgress::getLessonId)
                 .toList();
+    }
+
+    // Verifica se lição foi concluída
+    public boolean hasCompleted(Long userId, Long lessonId) {
+        return repository
+                .findByUserIdAndLessonId(userId, lessonId)
+                .map(LessonProgress::isCompleted)
+                .orElse(false);
     }
 }

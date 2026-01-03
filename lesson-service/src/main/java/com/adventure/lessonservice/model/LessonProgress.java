@@ -16,8 +16,6 @@ public class LessonProgress {
     private Long id;
 
     private Long userId;
-
     private Long lessonId;
-
     private boolean completed;
 }

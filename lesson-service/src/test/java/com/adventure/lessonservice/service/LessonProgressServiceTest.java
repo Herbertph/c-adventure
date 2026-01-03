@@ -1,11 +1,14 @@
 package com.adventure.lessonservice.service;
 
+import com.adventure.lessonservice.model.LessonProgress;
 import com.adventure.lessonservice.repository.LessonProgressRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -20,47 +23,56 @@ class LessonProgressServiceTest {
     private LessonProgressService lessonProgressService;
 
     @Test
-    void shouldAllowAccessToLesson1Always() {
-        // lesson 1 nunca depende de progresso anterior
-        boolean canAccess = true; // regra implícita do sistema
+    void shouldAllowAccessIfLessonCompleted() {
+        Long userId = 1L;
+        Long lessonId = 1L;
 
-        assertTrue(canAccess);
-        verifyNoInteractions(lessonProgressRepository);
+        LessonProgress progress = LessonProgress.builder()
+                .userId(userId)
+                .lessonId(lessonId)
+                .completed(true)
+                .build();
+
+        when(lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId))
+                .thenReturn(Optional.of(progress));
+
+        boolean result = lessonProgressService.hasCompleted(userId, lessonId);
+
+        assertTrue(result);
+
+        verify(lessonProgressRepository)
+                .findByUserIdAndLessonId(userId, lessonId);
     }
 
     @Test
-    void shouldAllowAccessToLesson2IfLesson1Completed() {
+    void shouldDenyAccessIfLessonNotCompleted() {
         Long userId = 1L;
-        Long previousLessonId = 1L;
+        Long lessonId = 1L;
 
-        when(lessonProgressRepository
-                .existsByUserIdAndLessonIdAndCompletedTrue(userId, previousLessonId))
-                .thenReturn(true);
+        LessonProgress progress = LessonProgress.builder()
+                .userId(userId)
+                .lessonId(lessonId)
+                .completed(false)
+                .build();
 
-        boolean hasCompletedPrevious =
-                lessonProgressService.hasCompleted(userId, previousLessonId);
+        when(lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId))
+                .thenReturn(Optional.of(progress));
 
-        assertTrue(hasCompletedPrevious);
+        boolean result = lessonProgressService.hasCompleted(userId, lessonId);
 
-        verify(lessonProgressRepository)
-                .existsByUserIdAndLessonIdAndCompletedTrue(userId, previousLessonId);
+        assertFalse(result);
     }
 
     @Test
-    void shouldDenyAccessToLesson2IfLesson1NotCompleted() {
+    void shouldDenyAccessIfNoProgressExists() {
         Long userId = 1L;
-        Long previousLessonId = 1L;
+        Long lessonId = 1L;
 
-        when(lessonProgressRepository
-                .existsByUserIdAndLessonIdAndCompletedTrue(userId, previousLessonId))
-                .thenReturn(false);
+        when(lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId))
+                .thenReturn(Optional.empty());
 
-        boolean hasCompletedPrevious =
-                lessonProgressService.hasCompleted(userId, previousLessonId);
+        boolean result = lessonProgressService.hasCompleted(userId, lessonId);
 
-        assertFalse(hasCompletedPrevious);
-
-        verify(lessonProgressRepository)
-                .existsByUserIdAndLessonIdAndCompletedTrue(userId, previousLessonId);
+        assertFalse(result);
     }
 }

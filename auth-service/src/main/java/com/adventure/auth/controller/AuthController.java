@@ -44,6 +44,11 @@ public ResponseEntity<UserResponse> me(
     }
 }
 
+@GetMapping("/health")
+public String health() {
+    return "OK";
+}
+
 
 }
 
