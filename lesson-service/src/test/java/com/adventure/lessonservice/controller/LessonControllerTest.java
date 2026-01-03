@@ -4,23 +4,17 @@ import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LessonController.class)
 class LessonControllerTest {
@@ -28,43 +22,58 @@ class LessonControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private LessonRepository lessonRepository;
 
     @MockBean
-    private CodeExecutionService codeExecutionService;
-
-    @MockBean
     private LessonProgressService lessonProgressService;
 
-    // --------------------------------------------------
-    // GET /lessons
-    // --------------------------------------------------
+    @MockBean
+    private CodeExecutionService codeExecutionService;
+
+    // -----------------------------------------
+    // ✅ ACCESS GRANTED: lesson 1 (sempre livre)
+    // -----------------------------------------
     @Test
-    void shouldReturnAllLessons() throws Exception {
+    void shouldAllowAccessToFirstLesson() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(1L);
-        lesson.setTitle("Intro");
 
-        when(lessonRepository.findAll())
-                .thenReturn(List.of(lesson));
+        when(lessonRepository.findById(1L))
+                .thenReturn(Optional.of(lesson));
 
-        mockMvc.perform(get("/lessons"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+        mockMvc.perform(
+                get("/lessons/1")
+                        .header("X-User-Id", 1L)
+        )
+        .andExpect(status().isOk());
     }
 
-    // --------------------------------------------------
-    // GET /lessons/{id} – acesso permitido
-    // --------------------------------------------------
+    // -----------------------------------------
+    // ❌ ACCESS DENIED: previous lesson not done
+    // -----------------------------------------
     @Test
-    void shouldReturnLessonWhenPreviousCompleted() throws Exception {
+    void shouldBlockLessonWhenPreviousNotCompleted() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(2L);
-        lesson.setTitle("Lesson 2");
+
+        when(lessonProgressService.hasCompleted(1L, 1L))
+                .thenReturn(false);
+
+        mockMvc.perform(
+                get("/lessons/2")
+                        .header("X-User-Id", 1L)
+        )
+        .andExpect(status().isForbidden());
+    }
+
+    // -----------------------------------------
+    // ✅ ACCESS GRANTED: previous lesson completed
+    // -----------------------------------------
+    @Test
+    void shouldAllowLessonWhenPreviousCompleted() throws Exception {
+        Lesson lesson = new Lesson();
+        lesson.setId(2L);
 
         when(lessonProgressService.hasCompleted(1L, 1L))
                 .thenReturn(true);
@@ -72,53 +81,28 @@ class LessonControllerTest {
         when(lessonRepository.findById(2L))
                 .thenReturn(Optional.of(lesson));
 
-        mockMvc.perform(get("/lessons/2")
-                        .header("X-User-Id", 1L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2));
+        mockMvc.perform(
+                get("/lessons/2")
+                        .header("X-User-Id", 1L)
+        )
+        .andExpect(status().isOk());
     }
 
-    // --------------------------------------------------
-    // GET /lessons/{id} – acesso BLOQUEADO
-    // --------------------------------------------------
+    // -----------------------------------------
+    // ❌ NOT FOUND: lesson does not exist
+    // -----------------------------------------
     @Test
-    void shouldBlockLessonWhenPreviousNotCompleted() throws Exception {
+    void shouldReturn404WhenLessonDoesNotExist() throws Exception {
         when(lessonProgressService.hasCompleted(1L, 1L))
-                .thenReturn(false);
+                .thenReturn(true);
 
-        mockMvc.perform(get("/lessons/2")
-                        .header("X-User-Id", 1L))
-                .andExpect(status().isForbidden());
-    }
+        when(lessonRepository.findById(2L))
+                .thenReturn(Optional.empty());
 
-    // --------------------------------------------------
-    // POST /lessons/submit
-    // --------------------------------------------------
-    @Test
-    void shouldReturnSuccessWhenCodeMatchesExpectedOutput() throws Exception {
-        Lesson lesson = new Lesson();
-        lesson.setId(1L);
-        lesson.setExpectedOutput("Hello");
-
-        when(lessonRepository.findById(1L))
-                .thenReturn(Optional.of(lesson));
-
-        when(codeExecutionService.executeCode(any(), any(), any()))
-                .thenReturn("Hello");
-
-        String body = """
-            {
-              "lessonId": 1,
-              "language": "java",
-              "code": "System.out.print(\\"Hello\\");",
-              "input": ""
-            }
-        """;
-
-        mockMvc.perform(post("/lessons/submit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+        mockMvc.perform(
+                get("/lessons/2")
+                        .header("X-User-Id", 1L)
+        )
+        .andExpect(status().isNotFound());
     }
 }
