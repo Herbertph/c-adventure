@@ -1,12 +1,12 @@
 <template>
-    <section class="bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-20 min-h-screen shadow-top-sm dark:shadow-top-md">
+    <section class="bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12  shadow-top-sm dark:shadow-top-md">
       <div class="max-w-7xl mx-auto px-6 space-y-12">
   
         <!-- Título -->
         <div class="text-center">
-          <h2 class="text-h2 font-display font-bold">Conteúdo do Curso</h2>
+          <h2 class="text-h2 font-display font-bold">Course Content</h2>
           <p class="text-p mt-4 max-w-2xl mx-auto">
-            Cada módulo é uma nova fase da sua jornada. Derrote inimigos, aprenda novos conceitos e avance como um verdadeiro guerreiro do código.
+            Each module is a new phase of your journey. Defeat enemies, learn new concepts and advance as a true warrior of the code.
           </p>
         </div>
   
@@ -18,7 +18,7 @@
             class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 hover:shadow-lg transition"
           >
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Módulo {{ index + 1 }}
+              Module {{ index + 1 }}
             </div>
             <h3 class="text-lg font-semibold text-primary mb-2">{{ module.title }}</h3>
             <p class="text-sm">{{ module.description }}</p>
@@ -32,28 +32,28 @@
   <script setup>
   const modules = [
     {
-      title: 'Variáveis e Tipos',
-      description: 'Aprenda a declarar variáveis, armazenar dados e entender os principais tipos em C#.'
+      title: 'Variables and Data Types',
+      description: 'Learn to declare variables, store data and understand the main types in C#.'
     },
     {
-      title: 'Condicionais',
-      description: 'Tome decisões com if/else e domine o fluxo lógico da sua aventura.'
+      title: 'Conditional Statements',
+      description: 'Make decisions with if/else and master the logical flow of your adventure.'
     },
     {
-      title: 'Loops e Repetições',
-      description: 'Use while e for para repetir ações — essencial para escapar de armadilhas mágicas.'
+      title: 'Loops and Repetitions',
+      description: 'Use while and for to repeat actions — essential to escape magical traps.'
     },
     {
-      title: 'Funções',
-      description: 'Crie habilidades reutilizáveis como atacar, desviar e curar.'
+      title: 'Functions and Methods',
+      description: 'Create reusable skills like attack, dodge and heal.'
     },
     {
-      title: 'Classes e Objetos',
-      description: 'Construa armas, inimigos e aliados com programação orientada a objetos.'
+      title: 'Classes and Objects',
+      description: 'Build weapons, enemies and allies with object-oriented programming.'
     },
     {
-      title: 'Herança e Polimorfismo',
-      description: 'Derrote inimigos complexos herdando habilidades e adaptando comportamentos.'
+      title: 'Inheritance and Polymorphism',
+      description: 'Defeat complex enemies by inheriting skills and adapting behaviors.'
     }
   ]
   </script>

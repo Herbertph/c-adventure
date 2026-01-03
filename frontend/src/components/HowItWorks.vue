@@ -1,11 +1,11 @@
 <template>
-<section class="bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-20 min-h-screen shadow-top-sm dark:shadow-top-md">
+<section class="bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12 shadow-top-sm dark:shadow-top-md">
   <div class="max-w-7xl mx-auto px-6 text-center space-y-12">
 
       <div>
-        <h2 class="text-h2 font-display font-bold">Como Funciona</h2>
+        <h2 class="text-h2 font-display font-bold">How It Works</h2>
         <p class="text-p mt-4 max-w-2xl mx-auto">
-          Aprender nunca foi tão épico. Você progride ao derrotar inimigos com código real, desbloqueando novos poderes a cada desafio.
+          Learning was never this epic. You progress by defeating enemies with real code, unlocking new powers with each challenge.
         </p>
       </div>
 
@@ -29,18 +29,18 @@
 const cards = [
   {
     icon: '🧠',
-    title: 'Aprenda Conceitos',
-    description: 'Cada etapa do curso ensina um novo conceito de programação com explicações simples e exemplos claros.'
+    title: 'Learn Concepts',
+    description: 'Each step of the course teaches a new programming concept with simple explanations and clear examples.'
   },
   {
     icon: '⚔️',
-    title: 'O código é sua arma',
-    description: 'Use o que aprendeu para enfrentar desafios e inimigos — cada linha de código conta.'
+    title: 'Code is Your Weapon',
+    description: 'Use what you learned to face challenges and enemies — every line of code counts.'
   },
   {
     icon: '🏆',
-    title: 'Desbloqueie Novas Fases',
-    description: 'Ao vencer, você desbloqueia novas fases da história e avança em sua jornada de aprendizado.'
+    title: 'Unlock New Levels',
+    description: 'By winning, you unlock new levels of the story and advance in your learning journey.'
   }
 ]
 </script>

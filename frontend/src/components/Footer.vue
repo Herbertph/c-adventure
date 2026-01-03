@@ -6,7 +6,7 @@
         <div class="text-center md:text-left space-y-2">
           <h3 class="text-xl font-display font-bold text-primary">C-Adventure</h3>
           <p class="text-sm opacity-80">
-            © {{ new Date().getFullYear() }} Todos os direitos reservados.
+            © {{ new Date().getFullYear() }} All rights reserved.
           </p>
         </div>
   
@@ -18,9 +18,6 @@
   <a href="https://instagram.com" target="_blank" aria-label="Instagram" class="hover:text-primary transition">
     <Instagram class="w-5 h-5" />
   </a>
-  <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn" class="hover:text-primary transition">
-    <Linkedin class="w-5 h-5" />
-  </a>
 </div>
   
       </div>
@@ -28,5 +25,5 @@
   </template>
   
   <script setup>
-import { Twitter, Instagram, Linkedin } from 'lucide-vue-next'
+import { Twitter, Instagram } from 'lucide-vue-next'
 </script>

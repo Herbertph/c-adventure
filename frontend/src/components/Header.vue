@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const isDark = ref(false)
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
 
 onMounted(() => {
@@ -21,6 +22,37 @@ const logout = () => {
   auth.logout()
   router.push('/')
 }
+
+const handleNavigation = (sectionId, fallbackPath) => {
+  if (route.path === '/') {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  } else {
+    router.push({ path: '/', hash: `#${sectionId}` })
+  }
+}
+
+const handleContentNavigation = () => {
+  if (route.path === '/') {
+    handleNavigation('conteudo', '/content')
+  } else {
+    router.push('/content')
+  }
+}
+
+const handlePricingNavigation = () => {
+  if (auth.user) {
+    router.push('/lessons')
+  } else {
+    if (route.path === '/') {
+      handleNavigation('precos', '/content')
+    } else {
+      router.push('/content')
+    }
+  }
+}
 </script>
 
 <template>
@@ -31,14 +63,11 @@ const logout = () => {
       </router-link>
 
       <div class="flex-1 flex justify-center text-textLight dark:text-textDark gap-6">
-        <router-link to="/" class="hover:text-primary transition">Home</router-link>
-        <router-link to="/content" class="hover:text-primary transition">Conteúdo</router-link>
-        <router-link
-  :to="auth.user ? '/lessons' : '/content'"
-  class="hover:text-primary transition"
->
-  {{ auth.user ? 'Lições' : 'Preços' }}
-</router-link>
+        <button @click="handleNavigation('home', '/')" class="hover:text-primary transition">Home</button>
+        <button @click="handleContentNavigation" class="hover:text-primary transition">Content</button>
+        <button @click="handlePricingNavigation" class="hover:text-primary transition">
+          {{ auth.user ? 'Lessons' : 'Prices' }}
+        </button>
       </div>
 
       <div class="flex items-center gap-2 text-textLight dark:text-textDark">
@@ -53,7 +82,7 @@ const logout = () => {
           <button @click="logout" class="hover:text-primary transition">Logout</button>
         </template>
         <template v-else>
-          <router-link to="/register" class="hover:text-primary transition">Cadastro</router-link> /
+          <router-link to="/register" class="hover:text-primary transition">Register</router-link> /
           <router-link to="/login" class="hover:text-primary transition">Login</router-link>
         </template>
 

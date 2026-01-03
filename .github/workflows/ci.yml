@@ -1,0 +1,98 @@
+name: Monorepo CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ----------------------------------------
+  # Detectar quais pastas mudaram
+  # ----------------------------------------
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      lesson: ${{ steps.filter.outputs.lesson }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            auth:
+              - 'auth-service/**'
+            lesson:
+              - 'lesson-service/**'
+            frontend:
+              - 'frontend/**'
+
+  # ----------------------------------------
+  # AUTH SERVICE
+  # ----------------------------------------
+  auth-service:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.auth == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run Auth Service Tests
+        working-directory: auth-service
+        run: mvn clean test
+
+  # ----------------------------------------
+  # LESSON SERVICE
+  # ----------------------------------------
+  lesson-service:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.lesson == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run Lesson Service Tests
+        working-directory: lesson-service
+        run: mvn clean test
+
+  # ----------------------------------------
+  # FRONTEND
+  # ----------------------------------------
+  frontend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build

@@ -7,9 +7,9 @@ import ContactForm from '../components/ContactForm.vue'
 </script>
 
 <template>
-  <HeroSection />
-  <HowItWorks />
-  <CourseContent />
-  <PricingSection />
-  <ContactForm />
+  <HeroSection id="home" />
+  <HowItWorks id="como-funciona" />
+  <CourseContent id="conteudo" />
+  <PricingSection id="precos" />
+  <ContactForm id="contato" />
 </template>
