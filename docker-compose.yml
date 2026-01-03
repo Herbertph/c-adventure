@@ -45,9 +45,9 @@ services:
       POSTGRES_USER: cadventure
       POSTGRES_PASSWORD: ${LESSON_DB_PASSWORD}
     volumes:
-      - lesson_pgdata:/var/lib/postgresql/data
+     - lesson-db-data:/var/lib/postgresql/data
     networks:
-      - cadventure-net
+     - cadventure-net
 
   # -------------------------
   # LESSON SERVICE
@@ -56,18 +56,19 @@ services:
     build: ./lesson-service
     container_name: lesson-service-adventure
     ports:
-      - "8082:8080"
+    - "8082:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://lesson-db:5432/cadventure_lessons
       SPRING_DATASOURCE_USERNAME: cadventure
       SPRING_DATASOURCE_PASSWORD: ${LESSON_DB_PASSWORD}
-      ADMIN_SECRET: ${ADMIN_SECRET}
+      ADMIN_SECRET: dev-secret
       CORS_ALLOWED_ORIGINS: http://localhost:5173
     depends_on:
       - lesson-db
     networks:
-      - cadventure-net
+     - cadventure-net
+      
 
   # -------------------------
   # FRONTEND
