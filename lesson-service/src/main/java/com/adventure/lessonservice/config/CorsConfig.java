@@ -24,11 +24,16 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(origins.toArray(new String[0]))
-                        .allowedMethods("*")
+                var mapping = registry.addMapping("/**")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
+
+                if (origins.contains("*")) {
+                    mapping.allowedOriginPatterns("*");
+                } else {
+                    mapping.allowedOrigins(origins.toArray(new String[0]));
+                }
             }
         };
     }
