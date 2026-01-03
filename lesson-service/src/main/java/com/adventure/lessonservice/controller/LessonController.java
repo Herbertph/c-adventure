@@ -3,6 +3,7 @@ package com.adventure.lessonservice.controller;
 import com.adventure.lessonservice.dto.SubmissionRequest;
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
+import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.http.ResponseEntity;
@@ -18,36 +19,37 @@ public class LessonController {
     private final LessonRepository lessonRepository;
     private final CodeExecutionService codeExecutionService;
     private final LessonProgressService progressService;
+    private final AdminGuard adminGuard;
 
     public LessonController(
             LessonRepository lessonRepository,
             CodeExecutionService codeExecutionService,
-            LessonProgressService progressService
+            LessonProgressService progressService,
+            AdminGuard adminGuard
     ) {
         this.lessonRepository = lessonRepository;
         this.codeExecutionService = codeExecutionService;
         this.progressService = progressService;
+        this.adminGuard = adminGuard;
     }
 
-    // GET /lessons → Lista todas as lições
+    // GET /lessons
     @GetMapping
     public List<Lesson> getAll() {
         return lessonRepository.findAll();
     }
 
-    // 🔒 GET /lessons/{id} → Busca lição com bloqueio por progresso
+    // 🔒 GET /lessons/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Lesson> getById(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId
     ) {
-        System.out.println("Acessando lição " + id + " para userId: " + userId);
         if (id > 1) {
             boolean hasPrevious =
                     progressService.hasCompleted(userId, id - 1);
-        System.out.println("Liçao anterior ( " + (id - 1) + ") concluída? " + hasPrevious);
+
             if (!hasPrevious) {
-                System.out.println("Bloqueando acesso à lição " + id);
                 return ResponseEntity.status(403).build();
             }
         }
@@ -57,7 +59,7 @@ public class LessonController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /lessons/submit → Submete código
+    // POST /lessons/submit
     @PostMapping("/submit")
     public ResponseEntity<?> submitCode(@RequestBody SubmissionRequest request) {
         Lesson lesson = lessonRepository.findById(request.lessonId).orElse(null);
@@ -84,31 +86,45 @@ public class LessonController {
         );
     }
 
-    // POST /lessons → Criar lição
+    // 🔐 ADMIN — CREATE
     @PostMapping
-    public Lesson createLesson(@RequestBody Lesson lesson) {
+    public Lesson createLesson(
+            @RequestHeader("X-Admin-Secret") String adminSecret,
+            @RequestBody Lesson lesson
+    ) {
+        adminGuard.check(adminSecret);
         return lessonRepository.save(lesson);
     }
 
-    // PUT /lessons/{id}
+    // 🔐 ADMIN — UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<Lesson> updateLesson(
+            @RequestHeader("X-Admin-Secret") String adminSecret,
             @PathVariable Long id,
             @RequestBody Lesson lesson
     ) {
+        adminGuard.check(adminSecret);
+
         if (!lessonRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+
         lesson.setId(id);
         return ResponseEntity.ok(lessonRepository.save(lesson));
     }
 
-    // DELETE /lessons/{id}
+    // 🔐 ADMIN — DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLesson(
+            @RequestHeader("X-Admin-Secret") String adminSecret,
+            @PathVariable Long id
+    ) {
+        adminGuard.check(adminSecret);
+
         if (!lessonRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+
         lessonRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }

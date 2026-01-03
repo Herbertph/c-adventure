@@ -2,6 +2,7 @@ package com.adventure.lessonservice.controller;
 
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
+import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,10 @@ class LessonControllerTest {
     @MockBean
     private CodeExecutionService codeExecutionService;
 
+    // 🔑 NOVO — necessário por causa do construtor
+    @MockBean
+    private AdminGuard adminGuard;
+
     // -----------------------------------------
     // ✅ ACCESS GRANTED: lesson 1 (sempre livre)
     // -----------------------------------------
@@ -54,9 +59,6 @@ class LessonControllerTest {
     // -----------------------------------------
     @Test
     void shouldBlockLessonWhenPreviousNotCompleted() throws Exception {
-        Lesson lesson = new Lesson();
-        lesson.setId(2L);
-
         when(lessonProgressService.hasCompleted(1L, 1L))
                 .thenReturn(false);
 
