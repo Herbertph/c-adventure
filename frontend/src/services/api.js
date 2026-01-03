@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 export function createApi(baseURL) {
-  const api = axios.create({ baseURL })
+  const api = axios.create({
+    baseURL,
+  })
 
   api.interceptors.request.use(config => {
     const token = localStorage.getItem('token')
