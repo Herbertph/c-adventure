@@ -34,8 +34,8 @@ export default defineConfig({
 
     // PROD
   preview: {
-    host: true,
-    port: process.env.PORT || 4173,
-    allowedHosts: 'all', 
-  },
+  host: true,
+  port: process.env.PORT || 4173,
+  allowedHosts: true,
+},
 })
