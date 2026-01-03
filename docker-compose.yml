@@ -1,5 +1,3 @@
-
-
 services:
   # -------------------------
   # AUTH DATABASE
@@ -10,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: auth_db
       POSTGRES_USER: auth_user
-      POSTGRES_PASSWORD: auth_pass
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     volumes:
       - auth_pgdata:/var/lib/postgresql/data
     networks:
@@ -25,9 +23,12 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
       SPRING_DATASOURCE_USERNAME: auth_user
-      SPRING_DATASOURCE_PASSWORD: auth_pass
+      SPRING_DATASOURCE_PASSWORD: ${AUTH_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_SECRET: ${ADMIN_SECRET}
     depends_on:
       - auth-db
     networks:
@@ -42,7 +43,7 @@ services:
     environment:
       POSTGRES_DB: cadventure_lessons
       POSTGRES_USER: cadventure
-      POSTGRES_PASSWORD: secret123
+      POSTGRES_PASSWORD: ${LESSON_DB_PASSWORD}
     volumes:
       - lesson_pgdata:/var/lib/postgresql/data
     networks:
@@ -57,9 +58,12 @@ services:
     ports:
       - "8082:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://lesson-db:5432/cadventure_lessons
       SPRING_DATASOURCE_USERNAME: cadventure
-      SPRING_DATASOURCE_PASSWORD: secret123
+      SPRING_DATASOURCE_PASSWORD: ${LESSON_DB_PASSWORD}
+      ADMIN_SECRET: ${ADMIN_SECRET}
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
     depends_on:
       - lesson-db
     networks:

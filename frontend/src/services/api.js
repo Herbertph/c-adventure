@@ -1,22 +1,22 @@
 import axios from 'axios'
 
-const api = axios.create({
-  baseURL: '/',
-})
+export function createApi(baseURL) {
+  const api = axios.create({ baseURL })
 
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  const userId = localStorage.getItem('userId')
+  api.interceptors.request.use(config => {
+    const token = localStorage.getItem('token')
+    const userId = localStorage.getItem('userId')
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
 
-  if (userId) {
-    config.headers['X-User-Id'] = userId
-  }
+    if (userId) {
+      config.headers['X-User-Id'] = userId
+    }
 
-  return config
-})
+    return config
+  })
 
-export default api
+  return api
+}

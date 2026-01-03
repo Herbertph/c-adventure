@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import api from '@/services/api'   
+import authApi from '@/services/authApi' 
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!token) return
 
     try {
-      const res = await api.get('/auth/me') 
+      const res = await authApi.get('/auth/me')
       user.value = res.data
     } catch (err) {
       console.error('Erro ao buscar usuário', err)

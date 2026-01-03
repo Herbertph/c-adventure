@@ -41,8 +41,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/services/api'
-
+import authApi from '@/services/authApi'
 
 const router = useRouter()
 
@@ -67,7 +66,7 @@ const submitForm = async () => {
   }
 
   try {
-    await api.post('/auth/register', form.value)
+    await authApi.post('/auth/register', form.value)
 
     success.value = 'Registration successful! Redirecting...'
 
@@ -79,4 +78,5 @@ const submitForm = async () => {
   }
 }
 </script>
+
   

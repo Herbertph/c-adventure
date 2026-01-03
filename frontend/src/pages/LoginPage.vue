@@ -29,8 +29,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
-import api from '@/services/api'
-
+import authApi from '@/services/authApi'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -46,7 +45,7 @@ const submitLogin = async () => {
   error.value = ''
 
   try {
-    const response = await api.post('/auth/login', form.value)
+    const response = await authApi.post('/auth/login', form.value)
 
     localStorage.setItem('token', response.data)
 
@@ -58,7 +57,6 @@ const submitLogin = async () => {
     error.value = err.response?.data || 'Invalid credentials.'
   }
 }
-
 </script>
 
 

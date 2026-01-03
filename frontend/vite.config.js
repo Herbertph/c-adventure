@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 export default defineConfig({
   plugins: [vue()],
 
@@ -11,21 +13,22 @@ export default defineConfig({
     },
   },
 
-  server: {
-    proxy: {
-      '/auth': {
-        target: 'http://auth-service:8080',
-        changeOrigin: true,
-      },
-      '/lessons': {
-        target: 'http://lesson-service:8080',
-        changeOrigin: true,
-      },
-      '/progress': {
-      target: 'http://lesson-service:8080',
-      changeOrigin: true,
-    },
-    },
-  },
+  server: isDev
+    ? {
+        proxy: {
+          '/auth': {
+            target: 'http://localhost:8080',
+            changeOrigin: true,
+          },
+          '/lessons': {
+            target: 'http://localhost:8082',
+            changeOrigin: true,
+          },
+          '/progress': {
+            target: 'http://localhost:8082',
+            changeOrigin: true,
+          },
+        },
+      }
+    : undefined,
 })
-

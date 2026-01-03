@@ -64,7 +64,7 @@ Actual: {{ result.actual }}
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/services/api'
+import lessonApi from '@/services/lessonApi'
 
 const route = useRoute()
 const router = useRouter()
@@ -76,16 +76,16 @@ const result = ref(null)
 const lessonId = computed(() => Number(route.params.id))
 const hasNextLesson = computed(() => lessonId.value < 3)
 
-// 🔹 BUSCA DA LIÇÃO (BACKEND DECIDE SE PODE)
+// 🔹 BUSCA DA LIÇÃO
 const fetchLesson = async () => {
   try {
-    const res = await api.get(`/lessons/${lessonId.value}`)
+    const res = await lessonApi.get(`/lessons/${lessonId.value}`)
     lesson.value = res.data
     code.value = res.data.initialCode
     result.value = null
   } catch (err) {
     if (err.response?.status === 403) {
-      router.push('/lessons') // 👈 volta para os cards
+      router.push('/lessons')
     } else {
       console.error('Erro ao carregar lição:', err)
     }
@@ -95,19 +95,18 @@ const fetchLesson = async () => {
 onMounted(fetchLesson)
 watch(() => route.params.id, fetchLesson)
 
-// 🔹 EXECUÇÃO
+// 🔹 EXECUÇÃO DO CÓDIGO
 const runCode = async () => {
   try {
-    const res = await api.post('/lessons/submit', {
+    const res = await lessonApi.post('/lessons/submit', {
       lessonId: lesson.value.id,
       language: 'csharp',
       code: code.value,
       input: '',
     })
 
-    // 🔹 SALVAR PROGRESSO (userId vem do interceptor)
     if (res.data.success) {
-      await api.post('/progress', {
+      await lessonApi.post('/progress', {
         userId: Number(localStorage.getItem('userId')),
         lessonId: lesson.value.id,
       })

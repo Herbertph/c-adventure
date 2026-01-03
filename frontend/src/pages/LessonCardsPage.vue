@@ -30,7 +30,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/services/api'
+import lessonApi from '@/services/lessonApi'
 
 const router = useRouter()
 
@@ -45,7 +45,7 @@ onMounted(async () => {
     const userId = localStorage.getItem('userId')
     if (!userId) return
 
-    const resProgress = await api.get(`/progress/${userId}`)
+    const resProgress = await lessonApi.get(`/progress/${userId}`)
     const completedIds = resProgress.data
 
     lessons.value = lessons.value.map((lesson, index) => {

@@ -36,9 +36,7 @@ public class CodeExecutionService {
             Map<String, Object> body = response.getBody();
 
             if (body != null) {
-                System.out.println("🟢 RESPOSTA COMPLETA DO PISTON:");
-                System.out.println(body);
-
+            
                 if (body.containsKey("output")) {
                     return body.get("output").toString();
                 } else if (body.containsKey("run")) {
