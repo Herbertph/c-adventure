@@ -1,35 +1,32 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import authApi from '@/services/authApi' 
+import authApi from '@/services/authApi'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
+  const isLoading = ref(false)
 
   const fetchUser = async () => {
     const token = localStorage.getItem('token')
     if (!token) return
 
     try {
+      isLoading.value = true
       const res = await authApi.get('/auth/me')
       user.value = res.data
-
-      // garante userId sincronizado
-      if (res.data?.id) {
-        localStorage.setItem('userId', res.data.id)
-      }
     } catch (err) {
       console.error('Erro ao buscar usuário', err)
       user.value = null
       localStorage.removeItem('token')
-      localStorage.removeItem('userId')
+    } finally {
+      isLoading.value = false
     }
   }
 
   const logout = () => {
     user.value = null
     localStorage.removeItem('token')
-    localStorage.removeItem('userId')
   }
 
-  return { user, fetchUser, logout }
+  return { user, isLoading, fetchUser, logout }
 })

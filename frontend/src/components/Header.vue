@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -10,8 +10,9 @@ const auth = useAuthStore()
 
 onMounted(() => {
   isDark.value = document.documentElement.classList.contains('dark')
-  auth.fetchUser()
 })
+
+const isLoggedIn = computed(() => !!auth.user)
 
 const toggleDarkMode = () => {
   isDark.value = !isDark.value
@@ -43,7 +44,7 @@ const handleContentNavigation = () => {
 }
 
 const handlePricingNavigation = () => {
-  if (auth.user) {
+  if (isLoggedIn.value) {
     router.push('/lessons')
   } else {
     if (route.path === '/') {
@@ -54,6 +55,7 @@ const handlePricingNavigation = () => {
   }
 }
 </script>
+
 
 <template>
   <header class="bg-backgroundLight dark:bg-backgroundDark shadow-md sticky top-0 z-50">
