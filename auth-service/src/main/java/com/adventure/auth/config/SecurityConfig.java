@@ -18,16 +18,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                // Preflight CORS
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // Auth endpoints (controle manual no controller)
-                .requestMatchers("/auth/register").permitAll()
-                .requestMatchers("/auth/login").permitAll()
-                .requestMatchers("/auth/me").permitAll()
-                .requestMatchers("/auth/health").permitAll()
-
-                // Todo o resto bloqueado por enquanto
+                .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
             );
 
