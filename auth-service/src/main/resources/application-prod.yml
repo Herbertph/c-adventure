@@ -1,23 +1,8 @@
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
-    driver-class-name: org.postgresql.Driver
-
-    hikari:
-      pool-name: AuthHikariPool
-      maximum-pool-size: 3
-      minimum-idle: 0
-      connection-timeout: 30000
-      idle-timeout: 30000
-      max-lifetime: 60000
-      validation-timeout: 5000
-      keepalive-time: 30000
 
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: false
-    open-in-view: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
