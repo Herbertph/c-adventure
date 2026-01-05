@@ -44,15 +44,21 @@ public class LessonController {
     @GetMapping("/{id}")
     public ResponseEntity<Lesson> getById(@PathVariable Long id) {
 
+        // 🔓 Primeira lição é pública
+        if (id == 1) {
+            return lessonRepository.findById(1L)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        }
+
+        // 🔒 A partir da lição 2, exige login
         Long userId = SecurityUtils.getCurrentUserId();
 
-        if (id > 1) {
-            boolean hasPrevious =
-                    progressService.hasCompleted(userId, id - 1);
+        boolean hasPrevious =
+                progressService.hasCompleted(userId, id - 1);
 
-            if (!hasPrevious) {
-                return ResponseEntity.status(403).build();
-            }
+        if (!hasPrevious) {
+            return ResponseEntity.status(403).build();
         }
 
         return lessonRepository.findById(id)
