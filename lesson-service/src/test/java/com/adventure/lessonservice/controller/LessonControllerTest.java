@@ -6,7 +6,9 @@ import com.adventure.lessonservice.repository.LessonRepository;
 import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
+import com.adventure.lessonservice.util.TestSecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -37,7 +39,6 @@ class LessonControllerTest {
         codeExecutionService = Mockito.mock(CodeExecutionService.class);
         adminGuard = Mockito.mock(AdminGuard.class);
 
-        // Admin sempre autorizado
         Mockito.doNothing().when(adminGuard).check(anyString());
 
         objectMapper = new ObjectMapper();
@@ -52,6 +53,14 @@ class LessonControllerTest {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(controller)
                 .build();
+
+        // 🔐 Mock do usuário autenticado (SecurityContext)
+        TestSecurityUtils.mockUser(1L);
+    }
+
+    @AfterEach
+    void tearDown() {
+        TestSecurityUtils.clear();
     }
 
     // -------------------------
@@ -66,10 +75,7 @@ class LessonControllerTest {
         Mockito.when(lessonRepository.findById(1L))
                 .thenReturn(Optional.of(lesson));
 
-        mockMvc.perform(
-                        get("/lessons/1")
-                                .header("X-User-Id", "1")
-                )
+        mockMvc.perform(get("/lessons/1"))
                 .andExpect(status().isOk());
     }
 
@@ -84,10 +90,7 @@ class LessonControllerTest {
         Mockito.when(progressService.hasCompleted(1L, 1L))
                 .thenReturn(false);
 
-        mockMvc.perform(
-                        get("/lessons/2")
-                                .header("X-User-Id", "1")
-                )
+        mockMvc.perform(get("/lessons/2"))
                 .andExpect(status().isForbidden());
     }
 
@@ -102,10 +105,7 @@ class LessonControllerTest {
         Mockito.when(progressService.hasCompleted(1L, 1L))
                 .thenReturn(true);
 
-        mockMvc.perform(
-                        get("/lessons/2")
-                                .header("X-User-Id", "1")
-                )
+        mockMvc.perform(get("/lessons/2"))
                 .andExpect(status().isOk());
     }
 
@@ -117,10 +117,7 @@ class LessonControllerTest {
         Mockito.when(lessonRepository.findById(999L))
                 .thenReturn(Optional.empty());
 
-        mockMvc.perform(
-                        get("/lessons/999")
-                                .header("X-User-Id", "1")
-                )
+        mockMvc.perform(get("/lessons/999"))
                 .andExpect(status().isNotFound());
     }
 

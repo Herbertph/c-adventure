@@ -6,6 +6,8 @@ import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.adventure.lessonservice.security.SecurityUtils;
+
 
 import java.util.List;
 
@@ -17,11 +19,14 @@ public class LessonProgressController {
     private LessonProgressService progressService;
 
     @PostMapping
-    public ResponseEntity<?> markAsCompleted(@RequestBody ProgressRequest request) {
-        progressService.markAsCompleted(request.getUserId(), request.getLessonId());
-        return ResponseEntity.ok("Progresso salvo com sucesso.");
-    }
+public ResponseEntity<?> markAsCompleted(@RequestBody ProgressRequest request) {
 
+    Long userId = SecurityUtils.getCurrentUserId();
+
+    progressService.markAsCompleted(userId, request.getLessonId());
+    return ResponseEntity.ok("Progresso salvo com sucesso.");
+}
+    
     @GetMapping("/{userId}")
     public List<Long> getCompletedLessons(@PathVariable Long userId) {
         return progressService.getCompletedLessonIds(userId);

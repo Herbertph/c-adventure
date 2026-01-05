@@ -8,6 +8,7 @@ import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.adventure.lessonservice.security.SecurityUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -41,10 +42,10 @@ public class LessonController {
 
     // 🔒 GET /lessons/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Lesson> getById(
-            @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId
-    ) {
+    public ResponseEntity<Lesson> getById(@PathVariable Long id) {
+
+        Long userId = SecurityUtils.getCurrentUserId();
+
         if (id > 1) {
             boolean hasPrevious =
                     progressService.hasCompleted(userId, id - 1);
