@@ -32,7 +32,7 @@ public class CorsConfig {
             "Authorization"
         ));
 
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source =
             new UrlBasedCorsConfigurationSource();
