@@ -15,7 +15,7 @@ public class LessonProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private String userId;
     private Long lessonId;
     private boolean completed;
 }

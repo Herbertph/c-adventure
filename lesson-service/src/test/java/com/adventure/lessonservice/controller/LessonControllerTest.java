@@ -34,6 +34,8 @@ class LessonControllerTest {
     private CodeExecutionService codeExecutionService;
     private AdminGuard adminGuard;
 
+    private static final String USER_ID = "user-1";
+
     @BeforeEach
     void setup() {
         lessonRepository = Mockito.mock(LessonRepository.class);
@@ -56,9 +58,9 @@ class LessonControllerTest {
                 .standaloneSetup(controller)
                 .build();
 
-        // 🔐 MOCK REALISTA DO USUÁRIO (IGUAL AO JWT)
+        // 🔐 MOCK REALISTA DO USUÁRIO (STRING, igual ao JWT)
         var auth = new UsernamePasswordAuthenticationToken(
-                "1",        // ⚠️ STRING — exatamente como o JWT injeta
+                USER_ID,
                 null,
                 List.of()
         );
@@ -94,7 +96,7 @@ class LessonControllerTest {
         Mockito.when(lessonRepository.findById(2L))
                 .thenReturn(Optional.of(lesson));
 
-        Mockito.when(progressService.hasCompleted(1L, 1L))
+        Mockito.when(progressService.hasCompleted(USER_ID, 1L))
                 .thenReturn(false);
 
         mockMvc.perform(get("/lessons/2"))
@@ -109,7 +111,7 @@ class LessonControllerTest {
         Mockito.when(lessonRepository.findById(2L))
                 .thenReturn(Optional.of(lesson));
 
-        Mockito.when(progressService.hasCompleted(1L, 1L))
+        Mockito.when(progressService.hasCompleted(USER_ID, 1L))
                 .thenReturn(true);
 
         mockMvc.perform(get("/lessons/2"))
@@ -118,7 +120,7 @@ class LessonControllerTest {
 
     @Test
     void shouldReturn404WhenLessonDoesNotExist() throws Exception {
-        Mockito.when(progressService.hasCompleted(1L, 998L))
+        Mockito.when(progressService.hasCompleted(USER_ID, 998L))
                 .thenReturn(true);
 
         Mockito.when(lessonRepository.findById(999L))

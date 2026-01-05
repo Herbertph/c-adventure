@@ -21,14 +21,14 @@ public class LessonProgressController {
     @PostMapping
 public ResponseEntity<?> markAsCompleted(@RequestBody ProgressRequest request) {
 
-    Long userId = SecurityUtils.getCurrentUserId();
+    String userId = SecurityUtils.getCurrentUserId();
 
     progressService.markAsCompleted(userId, request.getLessonId());
     return ResponseEntity.ok("Progresso salvo com sucesso.");
 }
     
     @GetMapping("/{userId}")
-    public List<Long> getCompletedLessons(@PathVariable Long userId) {
+    public List<Long> getCompletedLessons(@PathVariable String userId) {
         return progressService.getCompletedLessonIds(userId);
     }
 

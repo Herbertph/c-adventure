@@ -22,56 +22,55 @@ class LessonProgressServiceTest {
     @InjectMocks
     private LessonProgressService lessonProgressService;
 
+    private static final String USER_ID = "user-1";
+
     @Test
     void shouldAllowAccessIfLessonCompleted() {
-        Long userId = 1L;
         Long lessonId = 1L;
 
         LessonProgress progress = LessonProgress.builder()
-                .userId(userId)
+                .userId(USER_ID)
                 .lessonId(lessonId)
                 .completed(true)
                 .build();
 
-        when(lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId))
+        when(lessonProgressRepository.findByUserIdAndLessonId(USER_ID, lessonId))
                 .thenReturn(Optional.of(progress));
 
-        boolean result = lessonProgressService.hasCompleted(userId, lessonId);
+        boolean result = lessonProgressService.hasCompleted(USER_ID, lessonId);
 
         assertTrue(result);
 
         verify(lessonProgressRepository)
-                .findByUserIdAndLessonId(userId, lessonId);
+                .findByUserIdAndLessonId(USER_ID, lessonId);
     }
 
     @Test
     void shouldDenyAccessIfLessonNotCompleted() {
-        Long userId = 1L;
         Long lessonId = 1L;
 
         LessonProgress progress = LessonProgress.builder()
-                .userId(userId)
+                .userId(USER_ID)
                 .lessonId(lessonId)
                 .completed(false)
                 .build();
 
-        when(lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId))
+        when(lessonProgressRepository.findByUserIdAndLessonId(USER_ID, lessonId))
                 .thenReturn(Optional.of(progress));
 
-        boolean result = lessonProgressService.hasCompleted(userId, lessonId);
+        boolean result = lessonProgressService.hasCompleted(USER_ID, lessonId);
 
         assertFalse(result);
     }
 
     @Test
     void shouldDenyAccessIfNoProgressExists() {
-        Long userId = 1L;
         Long lessonId = 1L;
 
-        when(lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId))
+        when(lessonProgressRepository.findByUserIdAndLessonId(USER_ID, lessonId))
                 .thenReturn(Optional.empty());
 
-        boolean result = lessonProgressService.hasCompleted(userId, lessonId);
+        boolean result = lessonProgressService.hasCompleted(USER_ID, lessonId);
 
         assertFalse(result);
     }

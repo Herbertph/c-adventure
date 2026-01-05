@@ -16,7 +16,7 @@ public class LessonProgressService {
     }
 
     // Marca lição como concluída
-    public void markAsCompleted(Long userId, Long lessonId) {
+    public void markAsCompleted(String userId, Long lessonId) {
         LessonProgress progress = repository
                 .findByUserIdAndLessonId(userId, lessonId)
                 .orElseGet(() -> LessonProgress.builder()
@@ -31,7 +31,7 @@ public class LessonProgressService {
     }
 
     // Retorna IDs das lições concluídas
-    public List<Long> getCompletedLessonIds(Long userId) {
+    public List<Long> getCompletedLessonIds(String userId) {
         return repository.findByUserIdAndCompletedTrue(userId)
                 .stream()
                 .map(LessonProgress::getLessonId)
@@ -39,7 +39,7 @@ public class LessonProgressService {
     }
 
     // Verifica se lição foi concluída
-    public boolean hasCompleted(Long userId, Long lessonId) {
+    public boolean hasCompleted(String userId, Long lessonId) {
         return repository
                 .findByUserIdAndLessonId(userId, lessonId)
                 .map(LessonProgress::isCompleted)

@@ -8,13 +8,13 @@ import java.util.List;
 
 public class JwtUserPrincipal implements UserDetails {
 
-    private final Long userId;
+    private final String userId;
 
-    public JwtUserPrincipal(Long userId) {
+    public JwtUserPrincipal(String userId) {
         this.userId = userId;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 

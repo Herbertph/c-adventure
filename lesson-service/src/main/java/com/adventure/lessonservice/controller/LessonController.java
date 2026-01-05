@@ -8,6 +8,7 @@ import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import com.adventure.lessonservice.security.SecurityUtils;
 
 import java.util.List;
@@ -44,21 +45,25 @@ public class LessonController {
     @GetMapping("/{id}")
     public ResponseEntity<Lesson> getById(@PathVariable Long id) {
 
-        // 🔓 Primeira lição é pública
+        // Lição 1 é pública
         if (id == 1) {
             return lessonRepository.findById(1L)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         }
 
-        // 🔒 A partir da lição 2, exige login
-        Long userId = SecurityUtils.getCurrentUserId();
+        // A partir da lição 2 exige login
+        String userId = SecurityUtils.getCurrentUserId();
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         boolean hasPrevious =
                 progressService.hasCompleted(userId, id - 1);
 
         if (!hasPrevious) {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return lessonRepository.findById(id)

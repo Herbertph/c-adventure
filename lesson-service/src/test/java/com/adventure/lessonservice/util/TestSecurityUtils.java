@@ -9,7 +9,7 @@ public final class TestSecurityUtils {
 
     private TestSecurityUtils() {}
 
-    public static void mockUser(Long userId) {
+    public static void mockUser(String userId) {
         var auth = new UsernamePasswordAuthenticationToken(
                 userId,          
                 null,
