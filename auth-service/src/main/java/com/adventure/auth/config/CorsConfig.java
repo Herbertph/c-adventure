@@ -16,26 +16,26 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "https://c-adventure.vercel.app"
+            "https://c-adventure.vercel.app"
         ));
 
         config.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS"
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
 
         config.setAllowedHeaders(List.of(
-                "Authorization",
-                "Content-Type"
+            "Authorization",
+            "Content-Type"
         ));
 
         config.setExposedHeaders(List.of(
-                "Authorization"
+            "Authorization"
         ));
 
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+            new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", config);
         return source;
