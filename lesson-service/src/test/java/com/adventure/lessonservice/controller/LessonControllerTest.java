@@ -6,16 +6,18 @@ import com.adventure.lessonservice.repository.LessonRepository;
 import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
-import com.adventure.lessonservice.util.TestSecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -54,13 +56,18 @@ class LessonControllerTest {
                 .standaloneSetup(controller)
                 .build();
 
-        // 🔐 Mock do usuário autenticado (SecurityContext)
-        TestSecurityUtils.mockUser(1L);
+        // 🔐 MOCK REALISTA DO USUÁRIO (IGUAL AO JWT)
+        var auth = new UsernamePasswordAuthenticationToken(
+                "1",        // ⚠️ STRING — exatamente como o JWT injeta
+                null,
+                List.of()
+        );
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @AfterEach
     void tearDown() {
-        TestSecurityUtils.clear();
+        SecurityContextHolder.clearContext();
     }
 
     // -------------------------
