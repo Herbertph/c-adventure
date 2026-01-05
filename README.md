@@ -23,6 +23,12 @@ Services communicate via **REST APIs**, with **PostgreSQL** databases for data p
 The frontend consumes APIs from both backend services.
 
 ---
+## Tech Stack
+
+| **Frontend** | Vue.js 3, Pinia, Axios, Vite |
+| **Backend** | Java 17, Spring Boot, Spring Security (JWT) |
+| **Database** | PostgreSQL |
+| **DevOps** | Docker, Docker Compose, Railway |
 
 ## Microservices Documentation
 
@@ -131,6 +137,7 @@ The frontend uses environment variables to connect to backend services:
 ```env
 VITE_API_AUTH_URL
 VITE_API_LESSON_URL
+```
 
 ## Setup and Deployment
 
@@ -148,20 +155,58 @@ VITE_API_LESSON_URL
 
 2. Start all services with Docker Compose:
 
-```bash
 docker-compose up
 
 ### Or run services individually
 
 #### Auth-Service
 
-```bash
+
 mvn spring-boot:run
 
 Runs on port `8080`
 
 #### Lesson-Service
 
-```bash
 mvn spring-boot:run
-Runs on port 8082
+
+Runs on port `8080`
+
+#### Frontend
+
+npm run dev
+
+Runs on port `5173`
+
+## In Development
+
+The following components are currently under development and will be integrated into the existing microservices architecture:
+
+### Payment-Service
+
+A dedicated microservice responsible for communication with payment providers.
+
+**Planned responsibilities:**
+- Integration with external payment gateways
+- Secure payment processing
+- Handling subscriptions and course access control
+- Webhook handling for payment status updates
+- Separation of financial concerns from core business logic
+
+---
+
+### Notification-Service
+
+A microservice responsible for user communication via email.
+
+**Planned responsibilities:**
+- Sending transactional emails (registration, login alerts, progress updates)
+- Password recovery and account-related notifications
+- Integration with email providers (e.g. SMTP, SendGrid, SES)
+- Asynchronous communication with other services
+
+Both services will follow the same architectural principles used in the existing system, including:
+- REST-based communication
+- Environment-based configuration
+- Dockerized deployments
+- Independent scalability and responsibility boundaries
