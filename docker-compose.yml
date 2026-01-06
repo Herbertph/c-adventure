@@ -45,7 +45,7 @@ services:
       POSTGRES_USER: cadventure
       POSTGRES_PASSWORD: ${LESSON_DB_PASSWORD}
     volumes:
-     - lesson-db-data:/var/lib/postgresql/data
+     - lesson_pgdata:/var/lib/postgresql/data
     networks:
      - cadventure-net
 

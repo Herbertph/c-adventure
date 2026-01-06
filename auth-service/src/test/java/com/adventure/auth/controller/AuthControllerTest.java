@@ -1,6 +1,6 @@
 package com.adventure.auth.controller;
 
-import com.adventure.auth.controller.AuthController;
+
 import com.adventure.auth.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
