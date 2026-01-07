@@ -27,7 +27,7 @@ public ResponseEntity<?> markAsCompleted(
         return ResponseEntity.status(401).body("Usuário não autenticado");
     }
 
-    String userId = authentication.getPrincipal().toString();
+    String userId = authentication.getName();
 
     progressService.markAsCompleted(userId, request.getLessonId());
     return ResponseEntity.ok().build();
