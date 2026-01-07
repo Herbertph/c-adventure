@@ -107,9 +107,8 @@ const runCode = async () => {
 
     if (res.data.success) {
       await lessonApi.post('/progress', {
-        userId: Number(localStorage.getItem('userId')),
-        lessonId: lesson.value.id,
-      })
+  lessonId: lesson.value.id,
+})
     }
 
     result.value = res.data
