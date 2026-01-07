@@ -4,7 +4,6 @@ import com.adventure.lessonservice.dto.ProgressRequest;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,12 +23,12 @@ public class LessonProgressController {
             @RequestBody ProgressRequest request,
             Authentication authentication
     ) {
-        if (!(authentication instanceof JwtAuthenticationToken jwtAuth)) {
-            return ResponseEntity.status(401).body("Token JWT inválido");
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("User not authenticated");
         }
 
-       
-        String userId = jwtAuth.getToken().getClaimAsString("sub");
+        
+        String userId = (String) authentication.getPrincipal();
 
         progressService.markAsCompleted(userId, request.getLessonId());
         return ResponseEntity.ok().build();
