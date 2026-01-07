@@ -1,13 +1,10 @@
 package com.adventure.lessonservice.controller;
 
 import com.adventure.lessonservice.dto.ProgressRequest;
-import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.service.LessonProgressService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import com.adventure.lessonservice.security.SecurityUtils;
-
 
 import java.util.List;
 
@@ -15,22 +12,31 @@ import java.util.List;
 @RequestMapping("/progress")
 public class LessonProgressController {
 
-    @Autowired
-    private LessonProgressService progressService;
+    private final LessonProgressService progressService;
 
+    public LessonProgressController(LessonProgressService progressService) {
+        this.progressService = progressService;
+    }
+
+    
     @PostMapping
-public ResponseEntity<?> markAsCompleted(@RequestBody ProgressRequest request) {
+    public ResponseEntity<?> markAsCompleted(
+            @RequestBody ProgressRequest request,
+            Authentication authentication
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Usuário não autenticado");
+        }
 
-    String userId = SecurityUtils.getCurrentUserId();
+        String userId = authentication.getName();
 
-    progressService.markAsCompleted(userId, request.getLessonId());
-    return ResponseEntity.ok("Progresso salvo com sucesso.");
-}
+        progressService.markAsCompleted(userId, request.getLessonId());
+        return ResponseEntity.ok().build();
+    }
+
     
     @GetMapping("/{userId}")
     public List<Long> getCompletedLessons(@PathVariable String userId) {
         return progressService.getCompletedLessonIds(userId);
     }
-
-   
 }
