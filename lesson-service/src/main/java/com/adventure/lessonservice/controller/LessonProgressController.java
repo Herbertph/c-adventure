@@ -19,20 +19,19 @@ public class LessonProgressController {
     }
 
     @PostMapping
-    public ResponseEntity<?> markAsCompleted(
-            @RequestBody ProgressRequest request,
-            Authentication authentication
-    ) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).body("User not authenticated");
-        }
-
-        
-        String userId = (String) authentication.getPrincipal();
-
-        progressService.markAsCompleted(userId, request.getLessonId());
-        return ResponseEntity.ok().build();
+public ResponseEntity<?> markAsCompleted(
+        @RequestBody ProgressRequest request,
+        Authentication authentication
+) {
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(401).body("Usuário não autenticado");
     }
+
+    String userId = authentication.getPrincipal().toString();
+
+    progressService.markAsCompleted(userId, request.getLessonId());
+    return ResponseEntity.ok().build();
+}
 
     @GetMapping("/{userId}")
     public List<Long> getCompletedLessons(@PathVariable String userId) {
