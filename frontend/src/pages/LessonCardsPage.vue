@@ -28,11 +28,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import lessonApi from '@/services/lessonApi'
 
 const router = useRouter()
+const route = useRoute()
 
 const lessons = ref([
   { id: 1, title: 'Lesson 1: Hello World', locked: false, completed: false },
@@ -40,13 +41,10 @@ const lessons = ref([
   { id: 3, title: 'Lesson 3: Conditionals', locked: true, completed: false },
 ])
 
-onMounted(async () => {
+const loadLessons = async () => {
   try {
-    const userId = localStorage.getItem('userId')
-    if (!userId) return
-
-    const resProgress = await lessonApi.get(`/progress/${userId}`)
-    const completedIds = resProgress.data
+    const res = await lessonApi.get('/progress')
+    const completedIds = res.data
 
     lessons.value = lessons.value.map((lesson, index) => {
       const completed = completedIds.includes(lesson.id)
@@ -62,11 +60,19 @@ onMounted(async () => {
   } catch (err) {
     console.error('Erro ao carregar progresso:', err)
   }
-})
+}
 
-function goToLesson(lesson) {
+onMounted(loadLessons)
+
+watch(
+  () => route.fullPath,
+  () => {
+    loadLessons()
+  }
+)
+
+const goToLesson = (lesson) => {
   if (lesson.locked) return
   router.push(`/lessons/${lesson.id}`)
 }
 </script>
-
