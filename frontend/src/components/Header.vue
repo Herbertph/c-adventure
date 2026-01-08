@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -8,11 +8,17 @@ const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 
-onMounted(() => {
+// 🔹 GARANTE SINCRONIZAÇÃO DO USUÁRIO
+onMounted(async () => {
   isDark.value = document.documentElement.classList.contains('dark')
+
+  if (!auth.user && auth.token) {
+    await auth.fetchUser()
+  }
 })
 
-const isLoggedIn = computed(() => !!auth.user)
+// 🔹 REATIVO DE VERDADE
+const isLoggedIn = computed(() => Boolean(auth.user))
 
 const toggleDarkMode = () => {
   isDark.value = !isDark.value
@@ -24,7 +30,8 @@ const logout = () => {
   router.push('/')
 }
 
-const handleNavigation = (sectionId, fallbackPath) => {
+// 🔹 NAVEGAÇÃO INTELIGENTE
+const handleNavigation = (sectionId) => {
   if (route.path === '/') {
     const element = document.getElementById(sectionId)
     if (element) {
@@ -37,7 +44,7 @@ const handleNavigation = (sectionId, fallbackPath) => {
 
 const handleContentNavigation = () => {
   if (route.path === '/') {
-    handleNavigation('conteudo', '/content')
+    handleNavigation('conteudo')
   } else {
     router.push('/content')
   }
@@ -47,11 +54,7 @@ const handlePricingNavigation = () => {
   if (isLoggedIn.value) {
     router.push('/lessons')
   } else {
-    if (route.path === '/') {
-      handleNavigation('precos', '/content')
-    } else {
-      router.push('/content')
-    }
+    handleContentNavigation()
   }
 }
 </script>

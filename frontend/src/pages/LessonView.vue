@@ -65,18 +65,20 @@ Actual: {{ result.actual }}
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import lessonApi from '@/services/lessonApi'
+import { useLessonStore } from '@/stores/lessonStore'
 
 const route = useRoute()
 const router = useRouter()
+const lessonStore = useLessonStore()
 
 const lesson = ref(null)
 const code = ref('')
 const result = ref(null)
 
 const lessonId = computed(() => Number(route.params.id))
+
 const hasNextLesson = computed(() => lessonId.value < 3)
 
-// 🔹 BUSCA DA LIÇÃO
 const fetchLesson = async () => {
   try {
     const res = await lessonApi.get(`/lessons/${lessonId.value}`)
@@ -106,9 +108,13 @@ const runCode = async () => {
     })
 
     if (res.data.success) {
+      // Salva progresso no backend
       await lessonApi.post('/progress', {
-  lessonId: lesson.value.id,
-})
+        lessonId: lesson.value.id,
+      })
+
+      // 🔁 ATUALIZA PROGRESSO GLOBAL (corrige o bug)
+      await lessonStore.fetchProgress()
     }
 
     result.value = res.data
