@@ -68,16 +68,15 @@ import lessonApi from '@/services/lessonApi'
 
 const route = useRoute()
 const router = useRouter()
-const lessonStore = useLessonStore()
 
 const lesson = ref(null)
 const code = ref('')
 const result = ref(null)
 
 const lessonId = computed(() => Number(route.params.id))
-
 const hasNextLesson = computed(() => lessonId.value < 3)
 
+// 🔹 BUSCA DA LIÇÃO
 const fetchLesson = async () => {
   try {
     const res = await lessonApi.get(`/lessons/${lessonId.value}`)
@@ -96,6 +95,7 @@ const fetchLesson = async () => {
 onMounted(fetchLesson)
 watch(() => route.params.id, fetchLesson)
 
+// 🔹 EXECUÇÃO DO CÓDIGO
 const runCode = async () => {
   try {
     const res = await lessonApi.post('/lessons/submit', {
@@ -106,12 +106,10 @@ const runCode = async () => {
     })
 
     if (res.data.success) {
-      // Salva progresso no backend
+      // salva progresso no backend
       await lessonApi.post('/progress', {
         lessonId: lesson.value.id,
       })
-
-      await lessonStore.fetchProgress()
     }
 
     result.value = res.data
