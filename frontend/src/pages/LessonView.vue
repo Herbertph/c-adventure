@@ -65,7 +65,6 @@ Actual: {{ result.actual }}
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import lessonApi from '@/services/lessonApi'
-import { useLessonStore } from '@/stores/lessonStore'
 
 const route = useRoute()
 const router = useRouter()
@@ -97,7 +96,6 @@ const fetchLesson = async () => {
 onMounted(fetchLesson)
 watch(() => route.params.id, fetchLesson)
 
-// 🔹 EXECUÇÃO DO CÓDIGO
 const runCode = async () => {
   try {
     const res = await lessonApi.post('/lessons/submit', {
@@ -113,7 +111,6 @@ const runCode = async () => {
         lessonId: lesson.value.id,
       })
 
-      // 🔁 ATUALIZA PROGRESSO GLOBAL (corrige o bug)
       await lessonStore.fetchProgress()
     }
 
@@ -132,8 +129,6 @@ const goToNextLesson = () => {
   router.push(`/lessons/${lessonId.value + 1}`)
 }
 </script>
-
-
 
 <style scoped>
 .fade-slide-enter-active,
