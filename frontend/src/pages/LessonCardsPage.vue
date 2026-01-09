@@ -48,17 +48,17 @@ const loadProgress = async () => {
   const res = await lessonApi.get(`/progress/${userId}`)
   const completedIds = res.data
 
-  lessons.value = lessons.value.map((lesson, index) => {
-    const completed = completedIds.includes(lesson.id)
-    const previousCompleted =
-      index === 0 || completedIds.includes(lessons.value[index - 1].id)
+  lessons.value = lessons.value.map((lesson, index, arr) => {
+  const completed = completedIds.includes(lesson.id)
+  const previousCompleted =
+    index === 0 || completedIds.includes(arr[index - 1].id)
 
-    return {
-      ...lesson,
-      completed,
-      locked: !completed && !previousCompleted,
-    }
-  })
+  return {
+    ...lesson,
+    completed,
+    locked: !completed && !previousCompleted,
+  }
+})
 }
 
 onMounted(loadProgress)
