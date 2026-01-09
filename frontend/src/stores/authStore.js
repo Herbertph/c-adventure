@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('token', newToken)
       
       await fetchUser()
+      console.log('Login successful, user:', user.value)
       return true
     } catch (err) {
       console.error('Erro ao fazer login', err)

@@ -16,6 +16,10 @@ app.use(pinia)
 
 // 🔑 AQUI é o ponto certo
 const auth = useAuthStore()
-auth.fetchUser()
+
+// Carregar usuário se houver token armazenado
+if (localStorage.getItem('token')) {
+  auth.fetchUser()
+}
 
 app.mount('#app')

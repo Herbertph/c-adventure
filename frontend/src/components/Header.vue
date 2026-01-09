@@ -17,6 +17,11 @@ onMounted(async () => {
   }
 })
 
+// 🔹 WATCH PARA SINCRONIZAR MUDANÇAS DO STORE
+watch(() => auth.user, (newUser) => {
+  // Força reatividade quando o usuário muda
+}, { deep: true })
+
 // 🔹 REATIVO DE VERDADE
 const isLoggedIn = computed(() => Boolean(auth.user))
 
