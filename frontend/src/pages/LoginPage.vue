@@ -48,7 +48,7 @@ const submitLogin = async () => {
     const response = await authApi.post('/auth/login', form.value)
 
     localStorage.setItem('token', response.data)
-
+    await auth.fetchUser()
     router.push('/me')
   } catch (err) {
     error.value = err.response?.data || 'Invalid credentials.'
