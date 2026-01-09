@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 import { useRouter, useRoute } from 'vue-router'
 
 const isDark = ref(false)
@@ -8,22 +9,25 @@ const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 
+// 🔹 USE storeToRefs PARA GARANTIR REATIVIDADE
+const { user } = storeToRefs(auth)
+
 // 🔹 GARANTE SINCRONIZAÇÃO DO USUÁRIO
 onMounted(async () => {
   isDark.value = document.documentElement.classList.contains('dark')
 
-  if (!auth.user && auth.token) {
+  if (!user.value && auth.token) {
     await auth.fetchUser()
   }
 })
 
 // 🔹 WATCH PARA SINCRONIZAR MUDANÇAS DO STORE
-watch(() => auth.user, (newUser) => {
-  // Força reatividade quando o usuário muda
+watch(user, (newUser) => {
+  console.log('User changed in Header:', newUser)
 }, { deep: true })
 
 // 🔹 REATIVO DE VERDADE
-const isLoggedIn = computed(() => Boolean(auth.user))
+const isLoggedIn = computed(() => Boolean(user.value))
 
 const toggleDarkMode = () => {
   isDark.value = !isDark.value
@@ -76,17 +80,17 @@ const handlePricingNavigation = () => {
         <button @click="handleNavigation('home', '/')" class="hover:text-primary transition">Home</button>
         <button @click="handleContentNavigation" class="hover:text-primary transition">Content</button>
         <button @click="handlePricingNavigation" class="hover:text-primary transition">
-          {{ auth.user ? 'Lessons' : 'Prices' }}
+          {{ user ? 'Lessons' : 'Prices' }}
         </button>
       </div>
 
       <div class="flex items-center gap-2 text-textLight dark:text-textDark">
-        <template v-if="auth.user">
+        <template v-if="user">
           <router-link
             to="/me"
             class="font-semibold text-primary hover:underline transition"
           >
-            {{ auth.user.firstName }}
+            {{ user.firstName }}
           </router-link>
           /
           <button @click="logout" class="hover:text-primary transition">Logout</button>
