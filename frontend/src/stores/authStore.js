@@ -9,12 +9,19 @@ export const useAuthStore = defineStore('auth', () => {
 
   const fetchUser = async () => {
     const storedToken = token.value || localStorage.getItem('token')
-    if (!storedToken) return
+    console.log('fetchUser called, token:', storedToken)
+    if (!storedToken) {
+      console.log('No token found, returning')
+      return
+    }
 
     try {
       isLoading.value = true
+      console.log('Fetching user data...')
       const res = await authApi.get('/auth/me')
+      console.log('User data received:', res.data)
       user.value = res.data
+      console.log('user.value updated:', user.value)
     } catch (err) {
       console.error('Erro ao buscar usuário', err)
       user.value = null
