@@ -23,7 +23,6 @@ onMounted(async () => {
 
 // 🔹 WATCH PARA SINCRONIZAR MUDANÇAS DO STORE
 watch(user, (newUser) => {
-  console.log('User changed in Header:', newUser)
 }, { deep: true })
 
 // 🔹 REATIVO DE VERDADE

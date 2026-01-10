@@ -28,8 +28,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import lessonApi from '@/services/lessonApi'
 
 const router = useRouter()
@@ -45,30 +45,38 @@ const loadProgress = async () => {
   const userId = localStorage.getItem('userId')
   if (!userId) return
 
-  const res = await lessonApi.get(`/progress/${userId}`)
-  const completedIds = res.data
+  try {
+    const res = await lessonApi.get(`/progress/${userId}`)
+    const completedIds = res.data
 
-  lessons.value = lessons.value.map((lesson, index, arr) => {
-  const completed = completedIds.some(id => id == lesson.id)
-  const previousCompleted =
-    index === 0 || completedIds.some(id => id == arr[index - 1].id)
+    lessons.value = lessons.value.map((lesson, index, arr) => {
+      const completed = completedIds.includes(lesson.id)
+      const previousCompleted =
+        index === 0 || completedIds.includes(arr[index - 1].id)
 
-  return {
-    ...lesson,
-    completed,
-    locked: !completed && !previousCompleted,
+      return {
+        ...lesson,
+        completed,
+        locked: !completed && !previousCompleted,
+      }
+    })
+  } catch (err) {
+    console.error('Erro ao carregar progresso:', err)
   }
-})
 }
 
 onMounted(loadProgress)
 
-onBeforeRouteUpdate(() => {
-  loadProgress()
-})
+watch(
+  () => route.fullPath,
+  () => {
+    loadProgress()
+  }
+)
 
 function goToLesson(lesson) {
   if (lesson.locked) return
   router.push(`/lessons/${lesson.id}`)
 }
 </script>
+
