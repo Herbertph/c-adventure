@@ -49,9 +49,9 @@ const loadProgress = async () => {
   const completedIds = res.data
 
   lessons.value = lessons.value.map((lesson, index, arr) => {
-  const completed = completedIds.includes(lesson.id)
+  const completed = completedIds.some(id => id == lesson.id)
   const previousCompleted =
-    index === 0 || completedIds.includes(arr[index - 1].id)
+    index === 0 || completedIds.some(id => id == arr[index - 1].id)
 
   return {
     ...lesson,
