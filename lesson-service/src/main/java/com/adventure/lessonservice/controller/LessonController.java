@@ -94,46 +94,46 @@ public class LessonController {
     }
 
     // ===============================
-    // ADMIN (COMPATÍVEL COM OS TESTES)
-    // ===============================
+// ADMIN 
+// ===============================
 
-    @PostMapping
-    public Lesson createLesson(
-            @RequestHeader("X-Admin-Secret") String adminSecret,
-            @RequestBody Lesson lesson
-    ) {
-        adminGuard.check(adminSecret);
-        return lessonRepository.save(lesson);
+@PostMapping
+public Lesson createLesson(
+        @RequestHeader("X-Admin-Secret") String adminSecret,
+        @RequestBody Lesson lesson
+) {
+    adminGuard.check(adminSecret);
+    return lessonRepository.save(lesson);
+}
+
+@PutMapping("/{id}")
+public ResponseEntity<Lesson> updateLesson(
+        @RequestHeader("X-Admin-Secret") String adminSecret,
+        @PathVariable Long id,
+        @RequestBody Lesson lesson
+) {
+    adminGuard.check(adminSecret);
+
+    if (!lessonRepository.existsById(id)) {
+        return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Lesson> updateLesson(
-            @RequestHeader("X-Admin-Secret") String adminSecret,
-            @PathVariable Long id,
-            @RequestBody Lesson lesson
-    ) {
-        adminGuard.check(adminSecret);
+    lesson.setId(id);
+    return ResponseEntity.ok(lessonRepository.save(lesson));
+}
 
-        if (!lessonRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
+@DeleteMapping("/{id}")
+public ResponseEntity<Void> deleteLesson(
+        @RequestHeader("X-Admin-Secret") String adminSecret,
+        @PathVariable Long id
+) {
+    adminGuard.check(adminSecret);
 
-        lesson.setId(id);
-        return ResponseEntity.ok(lessonRepository.save(lesson));
+    if (!lessonRepository.existsById(id)) {
+        return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLesson(
-            @RequestHeader("X-Admin-Secret") String adminSecret,
-            @PathVariable Long id
-    ) {
-        adminGuard.check(adminSecret);
-
-        if (!lessonRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        lessonRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+    lessonRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
+}
 }

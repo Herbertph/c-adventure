@@ -19,29 +19,28 @@ public class SecurityConfig {
     private String jwtSecret;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
 
-                // 🔓 ADMIN (protegido por X-Admin-Secret)
-                .requestMatchers("/lessons").permitAll()
-                .requestMatchers("/lessons/**").permitAll()
+            // 🔓 ADMIN (sem JWT)
+            .requestMatchers("/admin/**").permitAll()
 
-                // 🔓 Público
-                .requestMatchers("/lessons/1").permitAll()
+            // 🔓 Público
+            .requestMatchers("/lessons").permitAll()
+            .requestMatchers("/lessons/1").permitAll()
 
-                // 🔒 Usuário autenticado
-                .requestMatchers("/progress/**").authenticated()
+            // 🔒 Usuário
+            .requestMatchers("/progress/**").authenticated()
 
-                // 🔒 Qualquer outra rota
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth -> oauth.jwt());
+            // 🔒 resto
+            .anyRequest().authenticated()
+        )
+        .oauth2ResourceServer(oauth -> oauth.jwt());
 
-        return http.build();
-    }
-
+    return http.build();
+}
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withSecretKey(
