@@ -42,12 +42,17 @@ const error = ref('')
 
 const submitLogin = async () => {
   error.value = ''
+  console.log('Starting submitLogin')
 
   try {
+    console.log('Calling auth.login')
     await auth.login(form.value)
+    console.log('Login successful, navigating to /me')
     await router.push('/me')
+    console.log('Navigation done, reloading page')
     window.location.reload()
   } catch (err) {
+    console.error('Login failed:', err)
     error.value = err.response?.data || 'Invalid credentials.'
   }
 }
