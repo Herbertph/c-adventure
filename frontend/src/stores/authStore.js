@@ -17,7 +17,6 @@ export const useAuthStore = defineStore('auth', () => {
       isLoading.value = true
       const res = await authApi.get('/auth/me')
       user.value = res.data
-      localStorage.setItem('userId', res.data.id)
     } catch (err) {
       console.error('Erro ao buscar usuário', err)
       user.value = null

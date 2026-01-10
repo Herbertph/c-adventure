@@ -33,8 +33,14 @@ public ResponseEntity<?> markAsCompleted(
     return ResponseEntity.ok().build();
 }
 
-    @GetMapping("/{userId}")
-    public List<Long> getCompletedLessons(@PathVariable String userId) {
+        @GetMapping
+    public List<Long> getCompletedLessons(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Usuário não autenticado");
+        }
+
+        String userId = authentication.getName(); // EMAIL
         return progressService.getCompletedLessonIds(userId);
     }
+
 }

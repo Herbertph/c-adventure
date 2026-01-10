@@ -42,11 +42,9 @@ const lessons = ref([
 ])
 
 const loadProgress = async () => {
-  const userId = localStorage.getItem('userId')
-  if (!userId) return
-
   try {
-    const res = await lessonApi.get(`/progress/${userId}`)
+    // 🔥 JWT identifica o usuário automaticamente
+    const res = await lessonApi.get('/progress')
     const completedIds = res.data
 
     lessons.value = lessons.value.map((lesson, index, arr) => {
@@ -79,4 +77,3 @@ function goToLesson(lesson) {
   router.push(`/lessons/${lesson.id}`)
 }
 </script>
-
