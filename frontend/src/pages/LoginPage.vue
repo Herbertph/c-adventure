@@ -45,7 +45,8 @@ const submitLogin = async () => {
 
   try {
     await auth.login(form.value)
-    router.push('/me')
+    await router.push('/me')
+    window.location.reload()
   } catch (err) {
     error.value = err.response?.data || 'Invalid credentials.'
   }

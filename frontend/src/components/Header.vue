@@ -12,14 +12,6 @@ const auth = useAuthStore()
 // 🔹 USE storeToRefs PARA GARANTIR REATIVIDADE
 const { user } = storeToRefs(auth)
 
-// 🔹 LOCAL USER PARA FORÇAR REATIVIDADE
-const localUser = ref(null)
-
-watch(() => auth.user, (newUser) => {
-  console.log('User changed in Header:', newUser)
-  localUser.value = newUser
-}, { immediate: true, deep: true })
-
 // 🔹 GARANTE SINCRONIZAÇÃO DO USUÁRIO
 onMounted(async () => {
   isDark.value = document.documentElement.classList.contains('dark')
@@ -31,11 +23,11 @@ onMounted(async () => {
 
 // 🔹 WATCH PARA SINCRONIZAR MUDANÇAS DO STORE
 watch(user, (newUser) => {
-  console.log('User changed in Header (old watch):', newUser)
+  console.log('User changed in Header:', newUser)
 }, { deep: true })
 
 // 🔹 REATIVO DE VERDADE
-const isLoggedIn = computed(() => Boolean(localUser.value))
+const isLoggedIn = computed(() => Boolean(user.value))
 
 const toggleDarkMode = () => {
   isDark.value = !isDark.value
@@ -88,17 +80,17 @@ const handlePricingNavigation = () => {
         <button @click="handleNavigation('home', '/')" class="hover:text-primary transition">Home</button>
         <button @click="handleContentNavigation" class="hover:text-primary transition">Content</button>
         <button @click="handlePricingNavigation" class="hover:text-primary transition">
-          {{ localUser ? 'Lessons' : 'Prices' }}
+          {{ user ? 'Lessons' : 'Prices' }}
         </button>
       </div>
 
       <div class="flex items-center gap-2 text-textLight dark:text-textDark">
-        <template v-if="localUser">
+        <template v-if="user">
           <router-link
             to="/me"
             class="font-semibold text-primary hover:underline transition"
           >
-            {{ localUser.firstName }}
+            {{ user.firstName }}
           </router-link>
           /
           <button @click="logout" class="hover:text-primary transition">Logout</button>
