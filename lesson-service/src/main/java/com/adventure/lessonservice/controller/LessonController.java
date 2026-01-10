@@ -1,21 +1,23 @@
 package com.adventure.lessonservice.controller;
 
 import com.adventure.lessonservice.dto.SubmissionRequest;
+import com.adventure.lessonservice.dto.LessonUpdateRequest;
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
 import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.security.SecurityUtils;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/lessons")
+@RequestMapping
 public class LessonController {
 
     private final LessonRepository lessonRepository;
@@ -39,12 +41,12 @@ public class LessonController {
     // PUBLIC
     // ===============================
 
-    @GetMapping
+    @GetMapping("/lessons")
     public List<Lesson> getAll() {
         return lessonRepository.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/lessons/{id}")
     public ResponseEntity<Lesson> getById(@PathVariable Long id) {
 
         // Lição 1 é pública
@@ -54,7 +56,7 @@ public class LessonController {
                     .orElse(ResponseEntity.notFound().build());
         }
 
-        // Demais exigem login + lição anterior
+        // Exige autenticação
         String userId = SecurityUtils.getCurrentUserId();
 
         boolean hasPrevious = progressService.hasCompleted(userId, id - 1);
@@ -67,7 +69,7 @@ public class LessonController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/submit")
+    @PostMapping("/lessons/submit")
     public ResponseEntity<?> submitCode(@RequestBody SubmissionRequest request) {
 
         Lesson lesson = lessonRepository.findById(request.lessonId).orElse(null);
@@ -94,10 +96,10 @@ public class LessonController {
     }
 
     // ===============================
-    // ADMIN (COMPATÍVEL COM OS TESTES)
+    // ADMIN
     // ===============================
 
-    @PostMapping
+    @PostMapping("/admin/lessons")
     public Lesson createLesson(
             @RequestHeader("X-Admin-Secret") String adminSecret,
             @RequestBody Lesson lesson
@@ -106,23 +108,34 @@ public class LessonController {
         return lessonRepository.save(lesson);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/admin/lessons/{id}")
     public ResponseEntity<Lesson> updateLesson(
             @RequestHeader("X-Admin-Secret") String adminSecret,
             @PathVariable Long id,
-            @RequestBody Lesson lesson
+            @RequestBody LessonUpdateRequest request
     ) {
         adminGuard.check(adminSecret);
 
-        if (!lessonRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+        Lesson lesson = lessonRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+
+        if (request.getTitle() != null) {
+            lesson.setTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            lesson.setDescription(request.getDescription());
+        }
+        if (request.getInitialCode() != null) {
+            lesson.setInitialCode(request.getInitialCode());
+        }
+        if (request.getExpectedOutput() != null) {
+            lesson.setExpectedOutput(request.getExpectedOutput());
         }
 
-        lesson.setId(id);
         return ResponseEntity.ok(lessonRepository.save(lesson));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/lessons/{id}")
     public ResponseEntity<Void> deleteLesson(
             @RequestHeader("X-Admin-Secret") String adminSecret,
             @PathVariable Long id
