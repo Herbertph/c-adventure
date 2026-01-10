@@ -50,7 +50,7 @@ public class CodeExecutionService {
             }
 
         } catch (Exception e) {
-            return "Erro ao executar código: " + e.getMessage();
+            return "Error when executing code: " + e.getMessage();
         }
-    }}
-
+    }
+}
