@@ -12,7 +12,7 @@ onMounted(async() => {
 </script>
 
 <template>
-  <Header :key="auth.user?.id" />
+  <Header :key="JSON.stringify(auth.user)" />
   <router-view />
   <Footer />
 </template>
