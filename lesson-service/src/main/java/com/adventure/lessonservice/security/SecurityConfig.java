@@ -23,18 +23,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-
-                // 🔓 ADMIN (protegido por X-Admin-Secret)
                 .requestMatchers("/lessons").permitAll()
-                .requestMatchers("/lessons/**").permitAll()
-
-                // 🔓 Público
                 .requestMatchers("/lessons/1").permitAll()
-
-                // 🔒 Usuário autenticado
                 .requestMatchers("/progress/**").authenticated()
-
-                // 🔒 Qualquer outra rota
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth -> oauth.jwt());
@@ -49,4 +40,3 @@ public class SecurityConfig {
         ).build();
     }
 }
-
