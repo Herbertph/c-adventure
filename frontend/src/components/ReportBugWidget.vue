@@ -1,24 +1,37 @@
 <template>
   <!-- Floating Button -->
   <button
-    class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-red-600 text-white shadow-lg flex items-center justify-center hover:bg-red-700 transition"
+    class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full
+           bg-indigo-600 text-white shadow-lg
+           flex items-center justify-center
+           hover:bg-indigo-700 transition"
     @click="toggle"
+    aria-label="Report a bug"
   >
-    🐞
+    <span class="text-2xl font-bold">!</span>
   </button>
 
   <!-- Chat Window -->
   <transition name="fade-scale">
     <div
       v-if="open"
-      class="fixed bottom-24 right-6 z-50 w-80 bg-white dark:bg-zinc-800 rounded-xl shadow-xl flex flex-col"
+      class="fixed bottom-24 right-6 z-50 w-80
+             bg-white dark:bg-zinc-800
+             rounded-xl shadow-xl flex flex-col"
     >
       <!-- Header -->
-      <div class="flex justify-between items-center px-4 py-3 border-b dark:border-zinc-700">
-        <h3 class="font-semibold text-gray-800 dark:text-white">
+      <div
+        class="flex justify-between items-center px-4 py-3
+               border-b dark:border-zinc-700
+               bg-indigo-50 dark:bg-zinc-900 rounded-t-xl"
+      >
+        <h3 class="font-semibold text-indigo-700 dark:text-indigo-400">
           Report a bug
         </h3>
-        <button @click="toggle" class="text-gray-500 hover:text-red-500">
+        <button
+          @click="toggle"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        >
           ✕
         </button>
       </div>
@@ -28,19 +41,24 @@
         <textarea
           v-model="message"
           placeholder="Describe the issue..."
-          class="w-full h-24 p-2 text-sm border rounded resize-none dark:bg-zinc-900 dark:border-zinc-700"
+          class="w-full h-24 p-3 text-sm rounded-lg resize-none
+                 border border-gray-300
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500
+                 dark:bg-zinc-900 dark:border-zinc-700 dark:text-white"
         />
 
         <button
           :disabled="loading || !message"
           @click="submit"
-          class="bg-red-600 text-white py-2 rounded hover:bg-red-700 disabled:opacity-50"
+          class="bg-indigo-600 text-white py-2 rounded-lg
+                 hover:bg-indigo-700 transition
+                 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ loading ? 'Sending...' : 'Send' }}
         </button>
 
-        <p v-if="success" class="text-green-600 text-sm">
-          Thanks! Your report was sent.
+        <p v-if="success" class="text-sm text-green-600">
+          Thank you! Your report was sent.
         </p>
       </div>
     </div>
