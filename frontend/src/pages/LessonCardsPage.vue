@@ -10,17 +10,27 @@
         :key="lesson.id"
         class="p-6 rounded-2xl shadow-md border transition-all cursor-pointer"
         :class="{
-          'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:shadow-lg': !lesson.locked,
-          'bg-gray-200 dark:bg-gray-700 border-gray-400 cursor-not-allowed opacity-50': lesson.locked,
-          'border-green-500 ring-2 ring-green-400': lesson.completed
+          'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:shadow-lg':
+            !lesson.locked,
+          'bg-gray-200 dark:bg-gray-700 border-gray-400 cursor-not-allowed opacity-50':
+            lesson.locked,
+          'border-green-500 ring-2 ring-green-400':
+            lesson.completed
         }"
         @click="goToLesson(lesson)"
       >
         <h2 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
           {{ lesson.title }}
         </h2>
+
         <p class="text-sm text-gray-600 dark:text-gray-300">
-          {{ lesson.locked ? 'Locked' : lesson.completed ? 'Completed' : 'Ready' }}
+          {{
+            lesson.locked
+              ? 'Locked'
+              : lesson.completed
+                ? 'Completed'
+                : 'Ready'
+          }}
         </p>
       </div>
     </div>
@@ -35,44 +45,51 @@ import lessonApi from '@/services/lessonApi'
 const router = useRouter()
 const route = useRoute()
 
-const lessons = ref([
-  { id: 1, title: 'Lesson 1: Hello World', locked: false, completed: false },
-  { id: 2, title: 'Lesson 2: Number to String', locked: true, completed: false },
-  { id: 3, title: 'Lesson 3: Conditionals', locked: true, completed: false },
-])
+const lessons = ref([])
 
-const loadProgress = async () => {
-  
+// -----------------------
+// Load lessons + progress
+// -----------------------
+const loadLessonsAndProgress = async () => {
   try {
-    const res = await lessonApi.get('/progress')
-    
+    // 1️⃣ busca lições (ordenadas pelo backend)
+    const lessonsRes = await lessonApi.get('/lessons')
 
-    const completedIds = res.data.map(id => Number(id))
+    // 2️⃣ busca progresso do usuário
+    const progressRes = await lessonApi.get('/progress')
+    const completedLessonIds = progressRes.data.map(id => Number(id))
 
-    lessons.value = lessons.value.map((lesson, index, arr) => {
-      const completed = completedIds.includes(lesson.id)
+    lessons.value = lessonsRes.data.map(lesson => {
+      const completed = completedLessonIds.includes(lesson.id)
+
       const previousCompleted =
-        lesson.id === 1 || completedIds.includes(arr[index - 1].id)
+        lesson.orderIndex === 1 ||
+        completedLessonIds.some(
+          id =>
+            lessonsRes.data.find(l => l.id === id)?.orderIndex ===
+            lesson.orderIndex - 1
+        )
 
       return {
         ...lesson,
         completed,
-        locked: !completed && !previousCompleted,
+        locked: !completed && !previousCompleted
       }
     })
   } catch (err) {
-    console.error('Erro ao carregar progresso:', err)
+    console.error('Erro ao carregar lições/progresso:', err)
   }
 }
 
-onMounted(loadProgress)
+onMounted(loadLessonsAndProgress)
 
 watch(
   () => route.fullPath,
-  () => loadProgress()
+  () => loadLessonsAndProgress()
 )
 
-function goToLesson(lesson) {
+// -----------------------
+const goToLesson = lesson => {
   if (lesson.locked) return
   router.push(`/lessons/${lesson.id}`)
 }

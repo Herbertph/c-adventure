@@ -3,7 +3,6 @@ package com.adventure.lessonservice.controller;
 import com.adventure.lessonservice.dto.SubmissionRequest;
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
-import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +19,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -32,7 +33,6 @@ class LessonControllerTest {
     private LessonRepository lessonRepository;
     private LessonProgressService progressService;
     private CodeExecutionService codeExecutionService;
-    private AdminGuard adminGuard;
 
     private static final String USER_ID = "user-1";
 
@@ -41,24 +41,20 @@ class LessonControllerTest {
         lessonRepository = Mockito.mock(LessonRepository.class);
         progressService = Mockito.mock(LessonProgressService.class);
         codeExecutionService = Mockito.mock(CodeExecutionService.class);
-        adminGuard = Mockito.mock(AdminGuard.class);
-
-        Mockito.doNothing().when(adminGuard).check(anyString());
 
         objectMapper = new ObjectMapper();
 
         LessonController controller = new LessonController(
                 lessonRepository,
                 codeExecutionService,
-                progressService,
-                adminGuard
+                progressService
         );
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(controller)
                 .build();
 
-        // 🔐 MOCK REALISTA DO USUÁRIO (STRING, igual ao JWT)
+        // 🔐 mock de autenticação (igual produção)
         var auth = new UsernamePasswordAuthenticationToken(
                 USER_ID,
                 null,
@@ -77,9 +73,10 @@ class LessonControllerTest {
     // -------------------------
 
     @Test
-    void shouldReturn200WhenLessonExists() throws Exception {
+    void shouldReturn200ForFirstLesson() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(1L);
+        lesson.setOrderIndex(1);
 
         Mockito.when(lessonRepository.findById(1L))
                 .thenReturn(Optional.of(lesson));
@@ -92,9 +89,17 @@ class LessonControllerTest {
     void shouldReturn403WhenPreviousLessonNotCompleted() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(2L);
+        lesson.setOrderIndex(2);
+
+        Lesson previousLesson = new Lesson();
+        previousLesson.setId(1L);
+        previousLesson.setOrderIndex(1);
 
         Mockito.when(lessonRepository.findById(2L))
                 .thenReturn(Optional.of(lesson));
+
+        Mockito.when(lessonRepository.findByOrderIndex(1))
+                .thenReturn(Optional.of(previousLesson));
 
         Mockito.when(progressService.hasCompleted(USER_ID, 1L))
                 .thenReturn(false);
@@ -107,9 +112,17 @@ class LessonControllerTest {
     void shouldReturn200WhenPreviousLessonCompleted() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(2L);
+        lesson.setOrderIndex(2);
+
+        Lesson previousLesson = new Lesson();
+        previousLesson.setId(1L);
+        previousLesson.setOrderIndex(1);
 
         Mockito.when(lessonRepository.findById(2L))
                 .thenReturn(Optional.of(lesson));
+
+        Mockito.when(lessonRepository.findByOrderIndex(1))
+                .thenReturn(Optional.of(previousLesson));
 
         Mockito.when(progressService.hasCompleted(USER_ID, 1L))
                 .thenReturn(true);
@@ -120,9 +133,6 @@ class LessonControllerTest {
 
     @Test
     void shouldReturn404WhenLessonDoesNotExist() throws Exception {
-        Mockito.when(progressService.hasCompleted(USER_ID, 998L))
-                .thenReturn(true);
-
         Mockito.when(lessonRepository.findById(999L))
                 .thenReturn(Optional.empty());
 
@@ -138,7 +148,7 @@ class LessonControllerTest {
     void shouldReturn400WhenSubmittingNonExistingLesson() throws Exception {
         SubmissionRequest request = new SubmissionRequest();
         request.lessonId = 1L;
-        request.language = "java";
+        request.language = "csharp";
         request.code = "code";
         request.input = "";
 
@@ -161,7 +171,7 @@ class LessonControllerTest {
 
         SubmissionRequest request = new SubmissionRequest();
         request.lessonId = 1L;
-        request.language = "java";
+        request.language = "csharp";
         request.code = "code";
         request.input = "";
 
@@ -188,7 +198,7 @@ class LessonControllerTest {
 
         SubmissionRequest request = new SubmissionRequest();
         request.lessonId = 1L;
-        request.language = "java";
+        request.language = "csharp";
         request.code = "code";
         request.input = "";
 
@@ -208,11 +218,11 @@ class LessonControllerTest {
     }
 
     // -------------------------
-    // ADMIN
+    // CREATE / UPDATE / DELETE (sem segurança)
     // -------------------------
 
     @Test
-    void shouldCreateLessonWhenAdminIsValid() throws Exception {
+    void shouldCreateLesson() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(1L);
 
@@ -221,7 +231,6 @@ class LessonControllerTest {
 
         mockMvc.perform(
                         post("/lessons")
-                                .header("X-Admin-Secret", "secret")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(lesson))
                 )
@@ -229,7 +238,7 @@ class LessonControllerTest {
     }
 
     @Test
-    void shouldUpdateLessonWhenAdminIsValid() throws Exception {
+    void shouldUpdateLesson() throws Exception {
         Lesson lesson = new Lesson();
         lesson.setId(1L);
 
@@ -241,7 +250,6 @@ class LessonControllerTest {
 
         mockMvc.perform(
                         put("/lessons/1")
-                                .header("X-Admin-Secret", "secret")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(lesson))
                 )
@@ -249,14 +257,11 @@ class LessonControllerTest {
     }
 
     @Test
-    void shouldDeleteLessonWhenAdminIsValid() throws Exception {
+    void shouldDeleteLesson() throws Exception {
         Mockito.when(lessonRepository.existsById(1L))
                 .thenReturn(true);
 
-        mockMvc.perform(
-                        delete("/lessons/1")
-                                .header("X-Admin-Secret", "secret")
-                )
+        mockMvc.perform(delete("/lessons/1"))
                 .andExpect(status().isNoContent());
     }
 }

@@ -3,13 +3,12 @@ package com.adventure.lessonservice.controller;
 import com.adventure.lessonservice.dto.SubmissionRequest;
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
-import com.adventure.lessonservice.security.AdminGuard;
+import com.adventure.lessonservice.security.SecurityUtils;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
-import com.adventure.lessonservice.security.SecurityUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -21,61 +20,70 @@ public class LessonController {
     private final LessonRepository lessonRepository;
     private final CodeExecutionService codeExecutionService;
     private final LessonProgressService progressService;
-    private final AdminGuard adminGuard;
 
     public LessonController(
             LessonRepository lessonRepository,
             CodeExecutionService codeExecutionService,
-            LessonProgressService progressService,
-            AdminGuard adminGuard
+            LessonProgressService progressService
     ) {
         this.lessonRepository = lessonRepository;
         this.codeExecutionService = codeExecutionService;
         this.progressService = progressService;
-        this.adminGuard = adminGuard;
     }
 
     // GET /lessons
     @GetMapping
     public List<Lesson> getAll() {
-        return lessonRepository.findAll();
+        return lessonRepository.findAllByOrderByOrderIndexAsc();
     }
 
-    // 🔒 GET /lessons/{id}
+    // GET /lessons/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Lesson> getById(@PathVariable Long id) {
 
-        // Lição 1 é pública
-        if (id == 1) {
-            return lessonRepository.findById(1L)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
+        Lesson lesson = lessonRepository.findById(id).orElse(null);
+        if (lesson == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        // A partir da lição 2 exige login
-        String userId = SecurityUtils.getCurrentUserId();
+        // Primeira lição é sempre pública
+        if (lesson.getOrderIndex() == 1) {
+            return ResponseEntity.ok(lesson);
+        }
 
+        // A partir da segunda, exige login
+        String userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        boolean hasPrevious =
-                progressService.hasCompleted(userId, id - 1);
+        // Busca a lição anterior pelo orderIndex
+        Lesson previousLesson = lessonRepository
+                .findByOrderIndex(lesson.getOrderIndex() - 1)
+                .orElse(null);
+
+        if (previousLesson == null) {
+            // erro de consistência de dados
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        boolean hasPrevious = progressService.hasCompleted(
+                userId,
+                previousLesson.getId()
+        );
 
         if (!hasPrevious) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        return lessonRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(lesson);
     }
 
     // POST /lessons/submit
     @PostMapping("/submit")
     public ResponseEntity<?> submitCode(@RequestBody SubmissionRequest request) {
-        Lesson lesson = lessonRepository.findById(request.lessonId).orElse(null);
 
+        Lesson lesson = lessonRepository.findById(request.lessonId).orElse(null);
         if (lesson == null) {
             return ResponseEntity.badRequest().body("Lição não encontrada.");
         }
@@ -89,6 +97,13 @@ public class LessonController {
         boolean passed = output.trim()
                 .equalsIgnoreCase(lesson.getExpectedOutput().trim());
 
+        if (passed) {
+            String userId = SecurityUtils.getCurrentUserId();
+            if (userId != null) {
+                progressService.markAsCompleted(userId, lesson.getId());
+            }
+        }
+
         return ResponseEntity.ok(
                 Map.of(
                         "success", passed,
@@ -98,37 +113,34 @@ public class LessonController {
         );
     }
 
-    // CREATE — TEMPORÁRIO (sem segurança)
-@PostMapping
-public Lesson createLesson(@RequestBody Lesson lesson) {
-    return lessonRepository.save(lesson);
-}
+    // CREATE (temporário, sem segurança)
+    @PostMapping
+    public Lesson createLesson(@RequestBody Lesson lesson) {
+        return lessonRepository.save(lesson);
+    }
 
-
-    // — UPDATE
+    // UPDATE (temporário, sem segurança)
     @PutMapping("/{id}")
-public ResponseEntity<Lesson> updateLesson(
-        @PathVariable Long id,
-        @RequestBody Lesson lesson
-) {
-    if (!lessonRepository.existsById(id)) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Lesson> updateLesson(
+            @PathVariable Long id,
+            @RequestBody Lesson lesson
+    ) {
+        if (!lessonRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        lesson.setId(id);
+        return ResponseEntity.ok(lessonRepository.save(lesson));
     }
 
-    lesson.setId(id);
-    Lesson updated = lessonRepository.save(lesson);
-    return ResponseEntity.ok(updated);
-}
-
-
+    // DELETE (temporário, sem segurança)
     @DeleteMapping("/{id}")
-public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
-    if (!lessonRepository.existsById(id)) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
+        if (!lessonRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        lessonRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
-
-    lessonRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-}
-
 }
