@@ -35,16 +35,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
             // resto exige auth
             .anyRequest().authenticated()
-        )
-        .oauth2ResourceServer(oauth -> oauth.jwt());
+        );
 
     return http.build();
 }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withSecretKey(
-            new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256")
-        ).build();
-    }
 }
