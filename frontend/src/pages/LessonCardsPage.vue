@@ -42,11 +42,10 @@ const lessons = ref([
 ])
 
 const loadProgress = async () => {
-  const userId = localStorage.getItem('userId')
-  if (!userId) return
-
+  
   try {
-    const res = await lessonApi.get(`/progress/${userId}`)
+    const res = await lessonApi.get('/progress')
+    
 
     const completedIds = res.data.map(id => Number(id))
 
