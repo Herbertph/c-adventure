@@ -31,9 +31,11 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import lessonApi from '@/services/lessonApi'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 
 const lessons = ref([
   { id: 1, title: 'Lesson 1: Hello World', locked: false, completed: false },
@@ -67,11 +69,15 @@ const loadProgress = async () => {
 
 onMounted(loadProgress)
 
+
 watch(
-  () => route.fullPath,
-  () => {
-    loadProgress()
-  }
+  () => authStore.user,
+  (newUser) => {
+    if (newUser) {
+      loadProgress()
+    }
+  },
+  { immediate: true }
 )
 
 function goToLesson(lesson) {
