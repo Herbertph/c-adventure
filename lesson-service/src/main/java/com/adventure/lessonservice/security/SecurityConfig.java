@@ -5,6 +5,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,19 +20,24 @@ public class SecurityConfig {
     private String jwtSecret;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/lessons").permitAll()
-                .requestMatchers("/lessons/1").permitAll()
-                .requestMatchers("/progress/**").authenticated()
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth -> oauth.jwt());
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            // PUBLIC
+            .requestMatchers(HttpMethod.GET, "/lessons/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/lessons").permitAll()
 
-        return http.build();
-    }
+            // PROGRESS
+            .requestMatchers("/progress/**").authenticated()
+
+            // resto exige auth
+            .anyRequest().authenticated()
+        )
+        .oauth2ResourceServer(oauth -> oauth.jwt());
+
+    return http.build();
+}
 
     @Bean
     public JwtDecoder jwtDecoder() {
