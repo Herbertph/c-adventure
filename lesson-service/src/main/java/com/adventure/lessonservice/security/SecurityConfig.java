@@ -27,6 +27,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             // PUBLIC
             .requestMatchers(HttpMethod.GET, "/lessons/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/lessons").permitAll()
+            .requestMatchers(HttpMethod.PUT, "/lessons/**").permitAll()
+            .requestMatchers(HttpMethod.DELETE, "/lessons/**").permitAll()
 
             // PROGRESS
             .requestMatchers("/progress/**").authenticated()

@@ -98,7 +98,6 @@ public class LessonController {
         );
     }
 
-    // 🔐 ADMIN — CREATE
     // CREATE — TEMPORÁRIO (sem segurança)
 @PostMapping
 public Lesson createLesson(@RequestBody Lesson lesson) {
@@ -106,36 +105,30 @@ public Lesson createLesson(@RequestBody Lesson lesson) {
 }
 
 
-    // 🔐 ADMIN — UPDATE
+    // — UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<Lesson> updateLesson(
-            @RequestHeader("X-Admin-Secret") String adminSecret,
-            @PathVariable Long id,
-            @RequestBody Lesson lesson
-    ) {
-        adminGuard.check(adminSecret);
-
-        if (!lessonRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        lesson.setId(id);
-        return ResponseEntity.ok(lessonRepository.save(lesson));
+public ResponseEntity<Lesson> updateLesson(
+        @PathVariable Long id,
+        @RequestBody Lesson lesson
+) {
+    if (!lessonRepository.existsById(id)) {
+        return ResponseEntity.notFound().build();
     }
 
-    // 🔐 ADMIN — DELETE
+    lesson.setId(id);
+    Lesson updated = lessonRepository.save(lesson);
+    return ResponseEntity.ok(updated);
+}
+
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLesson(
-            @RequestHeader("X-Admin-Secret") String adminSecret,
-            @PathVariable Long id
-    ) {
-        adminGuard.check(adminSecret);
-
-        if (!lessonRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        lessonRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
+    if (!lessonRepository.existsById(id)) {
+        return ResponseEntity.notFound().build();
     }
+
+    lessonRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
+}
+
 }
