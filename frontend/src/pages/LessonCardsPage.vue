@@ -29,11 +29,12 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import lessonApi from '@/services/lessonApi'
 
 const router = useRouter()
-const route = useRoute()
+const authStore = useAuthStore()
 
 const lessons = ref([
   { id: 1, title: 'Lesson 1: Hello World', locked: false, completed: false },
@@ -41,15 +42,12 @@ const lessons = ref([
   { id: 3, title: 'Lesson 3: Conditionals', locked: true, completed: false },
 ])
 
-const loadProgress = async () => {
-  const userId = localStorage.getItem('userId')
+const loadProgress = async (userId) => {
   if (!userId) return
 
   try {
     const res = await lessonApi.get(`/progress/${userId}`)
-
-    // NORMALIZA O PROGRESSO (ESSENCIAL)
-    const completedIds = res.data.map(p => p.lessonId)
+    const completedIds = res.data.map(Number) // blindagem extra
 
     lessons.value = lessons.value.map((lesson, index, arr) => {
       const completed = completedIds.includes(lesson.id)
@@ -67,13 +65,15 @@ const loadProgress = async () => {
   }
 }
 
-onMounted(loadProgress)
 
 watch(
-  () => route.fullPath,
-  () => {
-    loadProgress()
-  }
+  () => authStore.user,
+  (user) => {
+    if (user?.id) {
+      loadProgress(user.id)
+    }
+  },
+  { immediate: true }
 )
 
 function goToLesson(lesson) {
