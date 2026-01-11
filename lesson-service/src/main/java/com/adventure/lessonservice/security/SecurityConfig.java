@@ -16,35 +16,34 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            // PUBLIC
-            .requestMatchers(HttpMethod.GET, "/lessons/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/lessons").permitAll()
-            .requestMatchers(HttpMethod.PUT, "/lessons/**").permitAll()
-            .requestMatchers(HttpMethod.DELETE, "/lessons/**").permitAll()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // públicos
+                .requestMatchers("/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/lessons/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/lessons/submit").permitAll()
 
-            // PROGRESS
-            .requestMatchers("/progress/**").authenticated()
+                // exige login
+                .requestMatchers("/progress/**").authenticated()
 
-            // resto exige auth
-            .anyRequest().authenticated()
-        )
-        .oauth2ResourceServer(oauth -> oauth.jwt());
+                // resto bloqueado
+                .anyRequest().denyAll()
+            )
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class
+            );
 
-    return http.build();
-}
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withSecretKey(
-            new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256")
-        ).build();
+        return http.build();
     }
 }
+

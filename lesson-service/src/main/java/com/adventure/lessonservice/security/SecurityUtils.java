@@ -9,12 +9,12 @@ public final class SecurityUtils {
     private SecurityUtils() {}
 
     public static String getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new AccessDeniedException("Usuário não autenticado");
-        }
-
-        return auth.getName(); 
+    if (auth == null || !auth.isAuthenticated()) {
+        return null;
     }
+
+    return auth.getName();
+}
 }

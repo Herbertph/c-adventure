@@ -3,7 +3,6 @@ package com.adventure.lessonservice.controller;
 import com.adventure.lessonservice.dto.SubmissionRequest;
 import com.adventure.lessonservice.model.Lesson;
 import com.adventure.lessonservice.repository.LessonRepository;
-import com.adventure.lessonservice.security.AdminGuard;
 import com.adventure.lessonservice.service.CodeExecutionService;
 import com.adventure.lessonservice.service.LessonProgressService;
 import org.springframework.http.ResponseEntity;
@@ -21,18 +20,16 @@ public class LessonController {
     private final LessonRepository lessonRepository;
     private final CodeExecutionService codeExecutionService;
     private final LessonProgressService progressService;
-    private final AdminGuard adminGuard;
 
     public LessonController(
             LessonRepository lessonRepository,
             CodeExecutionService codeExecutionService,
-            LessonProgressService progressService,
-            AdminGuard adminGuard
+            LessonProgressService progressService
     ) {
         this.lessonRepository = lessonRepository;
         this.codeExecutionService = codeExecutionService;
         this.progressService = progressService;
-        this.adminGuard = adminGuard;
+    
     }
 
     // GET /lessons
@@ -97,38 +94,4 @@ public class LessonController {
                 )
         );
     }
-
-    // CREATE — TEMPORÁRIO (sem segurança)
-@PostMapping
-public Lesson createLesson(@RequestBody Lesson lesson) {
-    return lessonRepository.save(lesson);
-}
-
-
-    // — UPDATE
-    @PutMapping("/{id}")
-public ResponseEntity<Lesson> updateLesson(
-        @PathVariable Long id,
-        @RequestBody Lesson lesson
-) {
-    if (!lessonRepository.existsById(id)) {
-        return ResponseEntity.notFound().build();
-    }
-
-    lesson.setId(id);
-    Lesson updated = lessonRepository.save(lesson);
-    return ResponseEntity.ok(updated);
-}
-
-
-    @DeleteMapping("/{id}")
-public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
-    if (!lessonRepository.existsById(id)) {
-        return ResponseEntity.notFound().build();
-    }
-
-    lessonRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-}
-
 }
