@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12 shadow-top-sm dark:shadow-top-md">
+    <section id="pricing" class="bg-backgroundLight dark:bg-backgroundDark text-textLight dark:text-textDark py-12 shadow-top-sm dark:shadow-top-md">
       <div class="max-w-7xl mx-auto px-6 space-y-12">
   
         <!-- Cabeçalho -->

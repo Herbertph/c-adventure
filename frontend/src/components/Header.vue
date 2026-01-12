@@ -9,10 +9,8 @@ const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 
-// 🔹 USE storeToRefs PARA GARANTIR REATIVIDADE
 const { user } = storeToRefs(auth)
 
-// 🔹 GARANTE SINCRONIZAÇÃO DO USUÁRIO
 onMounted(async () => {
   isDark.value = document.documentElement.classList.contains('dark')
 
@@ -21,11 +19,9 @@ onMounted(async () => {
   }
 })
 
-// 🔹 WATCH PARA SINCRONIZAR MUDANÇAS DO STORE
 watch(user, (newUser) => {
 }, { deep: true })
 
-// 🔹 REATIVO DE VERDADE
 const isLoggedIn = computed(() => Boolean(user.value))
 
 const toggleDarkMode = () => {
@@ -77,8 +73,8 @@ const handlePricingNavigation = () => {
 
       <div class="flex-1 flex justify-center text-textLight dark:text-textDark gap-6">
         <button @click="handleNavigation('home', '/')" class="hover:text-primary transition">Home</button>
-        <button @click="handleContentNavigation" class="hover:text-primary transition">Content</button>
-        <button @click="handlePricingNavigation" class="hover:text-primary transition">
+        <button @click="handleContentNavigation('content')" class="hover:text-primary transition">Content</button>
+        <button @click="handlePricingNavigation('pricing')" class="hover:text-primary transition">
           {{ user ? 'Lessons' : 'Prices' }}
         </button>
       </div>
